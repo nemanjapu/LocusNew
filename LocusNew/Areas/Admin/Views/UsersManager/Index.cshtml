@@ -1,0 +1,36 @@
+﻿@model IEnumerable<LocusNew.Core.AdminViewModels.ViewUsersViewModel>
+@{
+    ViewBag.Title = "Korisnici";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid table-overflow">
+    <h2>Lista korisnika</h2>
+    <table class="table table-bordered datatable-table">
+        <thead>
+            <tr>
+                <th scope="col">Ime i prezime</th>
+                <th scope="col">Rola</th>
+                <th scope="col">Broj nekretnina</th>
+                <th scope="col">Izmijeni</th>
+                <th scope="col">Deaktiviraj</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Name</td>
+                    <td>@user.Role</td>
+                    <td>@user.NumberOfListings</td>
+                    <td><a class="table-anchor" href="@Url.Action("EditUser","UsersManager", new { @id = user.Id })" title="Izmijeni"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
+                    <td><a class="table-anchor" href="@Url.Action("ToggleActiveUser", "UsersManager", new { @id = user.Id })" title="Deaktiviraj"><i class="fa fa-dot-circle-o" aria-hidden="true"></i></a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/dataTableInit")
+}

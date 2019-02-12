@@ -1,0 +1,352 @@
+﻿@using System.Text.RegularExpressions
+@using LocusNew.Helpers
+@model LocusNew.Core.ViewModels.ListingDetailsViewModel
+@{
+    var ogDescription = Regex.Replace(Model.Listing.Heading.ToString(), "<[^>]*>", string.Empty);
+    var imageNameNoSpaces = Regex.Replace(Model.Listing.ImagePreview, " ", "%20");
+    var imagePathNoSpaces = Regex.Replace(Model.Listing.ImagePreviewPath, " ", "%20");
+}
+@section metatags{
+    <meta name="keywords" content="@Model.Listing.MetaKeywords" />
+    <meta property="og:url" content="https://www.locus.ba/search/listing/@Model.Listing.Id" />
+    <meta property="og:title" content="@Model.Listing.PropertyType.Name, @Model.Listing.Address, @Model.Listing.CityPart.Name - Locus Nekretnine" />
+    <meta property="og:description" content="@ogDescription" />
+    <meta property="og:image" content="https://www.locus.ba/@imagePathNoSpaces/@imageNameNoSpaces" />
+    <meta property="og:image:alt" content="@Model.Listing.PropertyType.Name, @Model.Listing.Address, @Model.Listing.CityPart.Name - Locus Nekretnine" />
+    <meta property="og:type" content="website" />
+    <meta property="fb:app_id" content="238576326796686" />
+}
+@{
+
+    ViewBag.Title = @Model.Listing.PropertyType.Name + "," + @Model.Listing.Address + "," + @Model.Listing.CityPart.Name;
+
+    Layout = "~/Views/Shared/_LayoutInner.cshtml";
+}
+@{
+    int slideNumber = 0;
+    int thumbNumber = 0;
+}
+@section styles{
+    @Styles.Render("~/Content/owlCSS")
+    @Styles.Render("~/Content/lightBoxCss")
+    @Styles.Render("~/Content/datepickerCss")
+}
+<div class="container-fluid listing-details-cont">
+    <div class="row">
+        <div class="col-xl-8">
+            <h1 class="heading blue">@Model.Listing.PropertyType.Name, @Model.Listing.Address, @Model.Listing.CityPart.Name</h1>
+            <div class="listing-desc">@Html.Raw(Model.Listing.Heading)</div>
+            <h1 class="heading small blue">šifra: <b>@Model.Listing.ListingUniqueCode</b></h1>
+            <div id="listingImages" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    @foreach (var image in Model.Listing.Images)
+                    {
+                        string isActive = "";
+                        if (slideNumber == 0)
+                        {
+                            isActive = "active";
+                        }
+                        <div class="carousel-item @isActive">
+                            <a href="https://www.locus.ba/@image.FilePath/@image.FileName" data-lightbox="listing-images-lb" class="img-listings"><img class="d-block w-100" src="https://www.locus.ba/@image.FilePath/@image.FileName"></a>
+                            <div class="listing-image-name">
+                                @HTMLhelpers.ListingImageName(image.FileNameNoExt)
+                            </div>
+                        </div>
+                        slideNumber += 1;
+                    }
+                    <div class="carousel-item">
+                        <a href="https://www.locus.ba/DynamicContent/UserImages/Cards/@Model.Listing.ApplicationUser.AgentCardImageName" data-lightbox="listing-images-lb" class="img-listings"><img class="d-block w-100" src="https://www.locus.ba/DynamicContent/UserImages/Cards/@Model.Listing.ApplicationUser.AgentCardImageName"></a>
+                        <div class="listing-image-name">
+                            @HTMLhelpers.ListingImageName("Vaš agent: " + Model.Listing.ApplicationUser.FullName)
+                        </div>
+                    </div>
+                </div>
+                <a class="carousel-control-prev" href="#listingImages" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#listingImages" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+            <div class="owl-carousel listing-preview-images-carousel">
+                @foreach (var image in Model.Listing.Images)
+                {
+                    <div data-target="#listingImages" data-slide-to="@thumbNumber" class="item"><img src="https://www.locus.ba/@image.FilePath/@image.FileName" alt="@image.FileName" /></div>
+                    thumbNumber += 1;
+                }
+                <div data-target="#listingImages" data-slide-to="@thumbNumber" class="item"><img src="https://www.locus.ba/DynamicContent/UserImages/Cards/@Model.Listing.ApplicationUser.AgentCardImageName" alt="@Model.Listing.ApplicationUser.AgentCardImageName" /></div>
+            </div>
+            <label class="mt-5"><b>Opis nekretnine:</b></label>
+            <p>@Html.Raw(Model.Listing.Details)</p>
+
+            <label><b>Osnovni podaci:</b></label>
+            <ul class="list-group listing-details">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Šifra nekretnine
+                    <span class="badge">@Model.Listing.ListingUniqueCode</span>
+                </li>
+                @if (!Model.Listing.isSold)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Cijena
+                        @if (Model.Listing.Price > 0)
+                        {
+                            string price;
+                            if (Model.Listing.MultiPrice)
+                            {
+                                price = Model.Listing.MultiPriceFrom.HasValue && Model.Listing.MultiPriceTo.HasValue ? Model.Listing.MultiPriceFrom.Value.ToString("0,0") + " - " + Model.Listing.MultiPriceTo.Value.ToString("0,0") : "N/A";
+                            }
+                            else
+                            {
+                                price = Model.Listing.Price.HasValue ? Model.Listing.Price.Value.ToString("0,0") : "N/A";
+                            }
+
+                            <span class="badge">@price KM</span>
+                        }
+                        else
+                        {
+                            <span class="badge">Na upit</span>
+                        }
+                    </li>
+                }
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Tip akcije
+                    <span class="badge">@Model.Listing.AdType.Name</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Tip nekretnine
+                    <span class="badge">@Model.Listing.PropertyType.Name</span>
+                </li>
+                @if (Model.Listing.MultiSquareMeters)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Površina nekretnine
+                        <span class="badge">@Model.Listing.MultiSquareMetersFrom - @Model.Listing.MultiSquareMetersTo m<sup>2</sup></span>
+                    </li>
+                }
+                else
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Površina nekretnine
+                        <span class="badge">@Model.Listing.SquareMeters m<sup>2</sup></span>
+                    </li>
+                }
+                @if (Model.Listing.MultiBedrooms)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Spavaćih soba
+                        <span class="badge">@Model.Listing.MultiBedroomsFrom - @Model.Listing.MultiBedroomsTo</span>
+                    </li>
+                }
+                else
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Spavaćih soba
+                        <span class="badge">@Model.Listing.Bedrooms</span>
+                    </li>
+                }
+                @if (Model.Listing.MultiRooms)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Soba
+                        <span class="badge">@Model.Listing.MultiRoomsFrom - @Model.Listing.MultiRoomsTo</span>
+                    </li>
+                }
+                else
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Soba
+                        <span class="badge">@Model.Listing.Rooms</span>
+                    </li>
+                }
+                @if (Model.Listing.MultiBathrooms)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Kupatila
+                        <span class="badge">@Model.Listing.MultiBathFrom - @Model.Listing.MultiBathTo</span>
+                    </li>
+                }
+                else
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Kupatila
+                        <span class="badge">@Model.Listing.Bathrooms</span>
+                    </li>
+                }
+                @HTMLhelpers.ListingInfoNumber("Toaleta", Model.Listing.Toilete)
+                @if (Model.Listing.PropertyType.Name != "Zemljište")
+                {
+                    if (string.IsNullOrEmpty(Model.Listing.FloorText))
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Sprat
+                            <span class="badge">@(Model.Listing.Floor == 0 ? "Prizemlje" : Model.Listing.Floor == 50 ? "Suteren" : Model.Listing.Floor == 100 ? "Potkrovlje" : Model.Listing.Floor.ToString())</span>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Sprat
+                            <span class="badge">@Model.Listing.FloorText</span>
+                        </li>
+                    }
+                }
+                @HTMLhelpers.ListingInfoNumber("Ukupno spratova", Model.Listing.TotalFloorNumber)
+                @HTMLhelpers.ListingInfoNumber("Površina parcele", Model.Listing.LotSquareMeters, true)
+                @HTMLhelpers.ListingInfoNumber("Površina dvorišta", Model.Listing.YardSquareMeters, true)
+                @HTMLhelpers.ListingInfoNumber("Godina izgradnje", Model.Listing.YearBuilt)
+                @HTMLhelpers.ListingInfoNumber("Godina zadnje adaptacije", Model.Listing.YearOfLastAdaptation)
+                @if (!string.IsNullOrEmpty(Model.Listing.Joinery))
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Stolarija
+                        <span class="badge">@Model.Listing.Joinery</span>
+                    </li>
+                }
+            </ul>
+            @if (Model.Listing.PropertyType.Name != "Zemljište")
+            {
+                <label><b>Ostali podaci:</b></label>
+            }
+            <div class="listing-details row m-0">
+                @HTMLhelpers.ListingInfo("Lift", Model.Listing.Elevator)
+                @HTMLhelpers.ListingInfo("Balkon", Model.Listing.Balcony)
+                @HTMLhelpers.ListingInfo("Terasa", Model.Listing.Terrace)
+                @HTMLhelpers.ListingInfo("Lođa", Model.Listing.Loggia)
+                @HTMLhelpers.ListingInfo("Tavan", Model.Listing.Attic)
+                @HTMLhelpers.ListingInfo("Podrum", Model.Listing.Basement)
+                @HTMLhelpers.ListingInfo("Ostava", Model.Listing.Pantry)
+                @HTMLhelpers.ListingInfo("Voda", Model.Listing.Water)
+                @HTMLhelpers.ListingInfo("Plin", Model.Listing.Gas)
+                @if (Model.Listing.Canalization != "false")
+                {
+                    <div class="col-xl-4 p-0">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Kanalizacija
+                            @if (Model.Listing.Canalization == "true")
+                            {
+                                <span class="badge"><i class="fas fa-check-circle"></i></span>
+                            }
+                            else
+                            {
+                                <span class="badge">Sept. jama</span>
+                            }
+                        </div>
+                    </div>
+                }
+                @HTMLhelpers.ListingInfo("Telefonski priključak", Model.Listing.TelephoneConnection)
+                @HTMLhelpers.ListingInfo("Električna energija", Model.Listing.Electricity)
+                @HTMLhelpers.ListingInfo("Centralno grijanje - Toplane", Model.Listing.CentralHeatingToplane)
+                @HTMLhelpers.ListingInfo("Kablovska TV", Model.Listing.CableTV)
+                @HTMLhelpers.ListingInfo("Internet", Model.Listing.Internet)
+                @HTMLhelpers.ListingInfo("Namještaj", Model.Listing.Furniture)
+                @HTMLhelpers.ListingInfo("Videofon", Model.Listing.Videophone)
+                @HTMLhelpers.ListingInfo("Interfon", Model.Listing.Interphone)
+                @HTMLhelpers.ListingInfo("Privatni parking", Model.Listing.PrivateParking)
+                @HTMLhelpers.ListingInfo("Garaža", Model.Listing.Garage)
+                @HTMLhelpers.ListingInfo("Blindo vrata", Model.Listing.ArmoredDoor)
+                @HTMLhelpers.ListingInfo("Klima uređaj", Model.Listing.AirConditioner)
+                @HTMLhelpers.ListingInfo("Nova Kuhinja", Model.Listing.NewKitchen)
+                @if (Model.Listing.CentralHeatingEtazno != "No")
+                {
+                    <div class="col-xl-4 p-0">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Etažno grijanje
+                            <span class="badge">@Model.Listing.CentralHeatingEtazno</span>
+                        </div>
+                    </div>
+                }
+                @if (Model.Listing.AlternativeHeating != "No")
+                {
+                    <div class="col-xl-12 p-0">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Alternativno grijanje
+                            <span class="badge">@Model.Listing.AlternativeHeating</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="side-section">
+                <div id="listing-map"></div>
+            </div>
+            @if (!Model.Listing.isSold)
+            {
+                <div class="side-section">
+                    <h1 class="heading blue small">Zakažite obilazak</h1>
+                    @using (Ajax.BeginForm("BookAShowing", "Search", null, new AjaxOptions
+                    {
+                        HttpMethod = "POST",
+                        InsertionMode = InsertionMode.Replace,
+                        UpdateTargetId = "BookAShowingForm"
+                    }))
+                    {
+                        <div id="BookAShowingForm">
+                            @Html.HiddenFor(m => m.BookAShowing.ListingId)
+                            @Html.HiddenFor(m => m.BookAShowing.ApplicationUserId)
+                            <div class="form-group">
+                                <label>Ime</label>
+                                @Html.TextBoxFor(m => m.BookAShowing.FirstName, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.BookAShowing.FirstName)
+                            </div>
+                            <div class="form-group">
+                                <label>Prezime</label>
+                                @Html.TextBoxFor(m => m.BookAShowing.LastName, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.BookAShowing.LastName)
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail</label>
+                                @Html.TextBoxFor(m => m.BookAShowing.Email, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.BookAShowing.Email)
+                            </div>
+                            <div class="form-group">
+                                <label>Telefon</label>
+                                @Html.TextBoxFor(m => m.BookAShowing.Phone, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.BookAShowing.Phone)
+                            </div>
+                            <div class="form-group" id="DatePicker">
+                                <label>Datum</label>
+                                @Html.TextBoxFor(m => m.BookAShowing.DateForShowing, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.BookAShowing.DateForShowing)
+                            </div>
+                            <div class="form-group">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="button btn-block" id="ShowingSubmitBtn">Pošalji</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            <div class="side-section">
+                <h1 class="heading blue small text-center">Vaš agent</h1>
+                <div class="text-center">
+                    <img class="mb-3 mw-100" src="https://www.locus.ba/DynamicContent/UserImages/@Model.Listing.ApplicationUser.ImageName" alt="@Model.Listing.ApplicationUser.ImageName" />
+                </div>
+                <h1 class="heading blue small text-center">@Model.Listing.ApplicationUser.FullName</h1>
+                <div class="text-center text-dark"><a class="text-dark" href="tel:@Model.Listing.ApplicationUser.PhoneNumber"><i class="fas fa-phone"></i> @Model.Listing.ApplicationUser.PhoneNumber</a></div>
+                <div class="text-center mb-2"><a class="text-dark" href="mailto:@Model.Listing.ApplicationUser.Email"><i class="fas fa-at"></i> @Model.Listing.ApplicationUser.Email</a></div>
+                <div class="text-center" style="font-size: 30px;">
+                    <a href="tel:@Model.Listing.ApplicationUser.PhoneNumber" class="mx-1"><i class="fab fa-viber"></i></a>
+                    <a style="font-size: 32px;" href="tel:@Model.Listing.ApplicationUser.PhoneNumber" class="mx-1"><i class="fab fa-whatsapp"></i></a>
+                    <a href="tel:@Model.Listing.ApplicationUser.PhoneNumber" class="mx-1"><img class="imo-icon" src="https://www.locus.ba/Content/Images/imo-ico.png" alt="imo" /></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ9ITEowmHPfUzKt0uM8eMCJi4sqKVozs&libraries=places"></script>
+    @Scripts.Render("~/bundles/owlJS")
+    @Scripts.Render("~/bundles/lightboxJS")
+    @Scripts.Render("~/bundles/jquiJS")
+    @Scripts.Render("~/bundles/single-listingScript")
+
+    <script>
+        GetTodaysDate(@DateTime.Now.ToShortDateString());
+        GetDefaultBounds(@Model.Listing.Latidute, @Model.Listing.Longitude);
+    </script>
+}

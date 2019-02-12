@@ -1,0 +1,388 @@
+﻿@model LocusNew.Core.ViewModels.HomeViewModel
+@section metatags{
+    <meta name="keywords" content="locus, agencija, nekretnine, nekretnine sarajevo, sarajevo nekretnine, sarajevo, sarajevo kuce, sarajevo stanovi, sarajevo stan, sarajevo zeljiste, rent, sale, real estate, apartments, house, flat, property, business property, prodaja, ponuda, garaze, kupujem stan, prodajem stan, prodajem kucu, kuca, prodajem zemljiste, oglasi, kuce, vikendice" />
+    <meta name="description" content="LOCUS Nekretnine d.o.o. Sarajevo je agencija za posredovanje u prodaji nekretnina sa inovativnim pristupom u ovom poslu. Na kraju, naša upornost i aktivan rad sa kupcima su najbolja garancija uspjeha." />
+    <link href="https://www.locus.ba/" rel="canonical" />
+    <meta property="og:url" content="https://www.locus.ba/" />
+    <meta property="og:title" content="Locus Nekretnine Sarajevo" />
+    <meta property="og:description" content="LOCUS Nekretnine d.o.o. Sarajevo je agencija za posredovanje u prodaji nekretnina sa inovativnim pristupom u ovom poslu. Na kraju, naša upornost i aktivan rad sa kupcima su najbolja garancija uspjeha." />
+    <meta property="og:image:alt" content="Locus Nekretnine Sarajevo" />
+    <meta property="og:type" content="website" />
+    <meta property="fb:app_id" content="238576326796686" />
+}
+@section styles{
+    @Styles.Render("https://www.locus.ba/Content/owlCSS")
+    @Styles.Render("~/Content/datepickerCss");
+}
+@{
+    ViewBag.Title = "Naslovna";
+}
+<div class="side-bar clearfix">
+    <div class="icons-con clearfix">
+        @if (!string.IsNullOrEmpty(LocusNew.Helpers.LayoutGetValues.GetEmail()))
+        {
+            <a href="mailto:@LocusNew.Helpers.LayoutGetValues.GetEmail()">
+                <i class="side-icon far fa-envelope envelope"></i>
+            </a>
+        }
+        @if (!string.IsNullOrEmpty(LocusNew.Helpers.LayoutGetValues.GetPhone()))
+        {
+            <a href="tel:@LocusNew.Helpers.LayoutGetValues.GetPhone()">
+                <i class="side-icon fas fa-phone envelope mb-5"></i>
+            </a>
+        }
+        @if (!string.IsNullOrEmpty(LocusNew.Helpers.LayoutGetValues.GetFacebook()))
+        {
+            <a target="_blank" href="@LocusNew.Helpers.LayoutGetValues.GetFacebook()">
+                <i class="side-icon fab fa-facebook-f facebook"></i>
+            </a>
+        }
+        @if (!string.IsNullOrEmpty(LocusNew.Helpers.LayoutGetValues.GetTwitter()))
+        {
+            <a target="_blank" href="@LocusNew.Helpers.LayoutGetValues.GetTwitter()">
+                <i class="side-icon fab fa-twitter twitter"></i>
+            </a>
+        }
+        @if (!string.IsNullOrEmpty(LocusNew.Helpers.LayoutGetValues.GetLinkedin()))
+        {
+            <a target="_blank" href="@LocusNew.Helpers.LayoutGetValues.GetLinkedin()">
+                <i class="side-icon fab fa-linkedin-in linkedin"></i>
+            </a>
+        }
+        @if (!string.IsNullOrEmpty(LocusNew.Helpers.LayoutGetValues.GetPinterest()))
+        {
+            <a target="_blank" href="@LocusNew.Helpers.LayoutGetValues.GetPinterest()">
+                <i class="side-icon fab fa-pinterest-p pinterest"></i>
+            </a>
+        }
+        @if (!string.IsNullOrEmpty(LocusNew.Helpers.LayoutGetValues.GetInstagram()))
+        {
+            <a target="_blank" href="@LocusNew.Helpers.LayoutGetValues.GetInstagram()">
+                <i class="side-icon fab fa-instagram instagram"></i>
+            </a>
+        }
+        @if (!string.IsNullOrEmpty(LocusNew.Helpers.LayoutGetValues.GetYoutube()))
+        {
+            <a target="_blank" href="@LocusNew.Helpers.LayoutGetValues.GetYoutube()">
+                <i class="side-icon fab fa-youtube youtube"></i>
+            </a>
+        }
+        @if (!string.IsNullOrEmpty(LocusNew.Helpers.LayoutGetValues.GetGooglePlus()))
+        {
+            <a target="_blank" href="@LocusNew.Helpers.LayoutGetValues.GetGooglePlus()">
+                <i class="side-icon fab fa-google-plus-g google-plus"></i>
+            </a>
+        }
+    </div>
+</div>
+<div class="selling-home">
+    <a href="@Url.Action("Index", "Selling")">PRODAJETE NEKRETNINU?</a>
+</div>
+<div class="banner">
+    <img class="banner-img" src="/Content/images/banner.jpg" alt="Prodaja Nekretnina Sarajevo">
+    <div class="search-form">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-6 ml-auto">
+                    @using (Html.BeginForm("Index", "Search", FormMethod.Get))
+                    {
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <input type="text" name="cityPart" id="cityPart" class="form-control" placeholder="Naselje" autocomplete="off" />
+                                    @Html.Hidden("cityPartId")
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="submit" class="button btn-block">pretraga</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<article class="listings-article">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 listings">
+                <h1 class="d-none">Locus Nekretnine Sarajevo</h1>
+                <h2 class="heading">istaknuti oglasi</h2>
+                <div class="owl-carousel listings-carousel">
+                    @foreach (var l in Model.Listings)
+                    {
+                        <a href="@Url.Action("Listing", "Search", new { @id = l.Id })">
+                            <div class="listing">
+                                <img src="https://www.locus.ba/@l.Image.FilePath/@l.Image.FileName" alt="@l.Address, @l.CityPart.Name, Sarajevo">
+                                @if (l.isReserved && !l.isSold)
+                                {
+                                    <img src="https://www.locus.ba/Content/Images/reserved.png" alt="rezervisano" class="sold-img" />
+                                }
+                                @if (l.isSold)
+                                {
+                                    <img src="https://www.locus.ba/Content/Images/sold.png" alt="prodano" class="sold-img" />
+                                }
+                                <div class="overlay">
+                                    @if (l.AdType.Name != "Oglas")
+                                    {
+                                        <div class="address">
+                                            <i class="fas fa-map-marker-alt"></i> @l.Address, @l.CityPart.Name
+                                        </div>
+                                        <div class="bed-bath">
+                                            @if (l.PropertyType.Name != "Zemljište")
+                                            {
+                                                if (l.MultiBedrooms)
+                                                {
+                                                    <span>
+                                                        <i class="fas fa-bed"></i> @l.MultiBedroomsFrom - @l.MultiBedroomsTo
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span>
+                                                        <i class="fas fa-bed"></i> @l.Bedrooms
+                                                    </span>
+                                                }
+                                                if (l.MultiBathrooms)
+                                                {
+                                                    <span>
+                                                        <i class="fas fa-bath"></i> @l.MultiBathFrom - @l.MultiBathTo
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span>
+                                                        <i class="fas fa-bath"></i> @l.Bathrooms
+                                                    </span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span>
+                                                    <i class="fas fa-vector-square"></i> @l.LotSquareMeters m<sup>2</sup>
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                    @if (l.AdType.Name != "Oglas")
+                                    {
+                                        if (l.Price > 0)
+                                        {
+                                            string price;
+                                            <div class="price">
+                                                @if (l.MultiPrice)
+                                                {
+                                                    price = l.MultiPriceFrom.HasValue && l.MultiPriceTo.HasValue ? l.MultiPriceFrom.Value.ToString("0,0") + " - " + l.MultiPriceTo.Value.ToString("0,0") : "N/A";
+                                                }
+                                                else
+                                                {
+                                                    price = l.Price.HasValue ? l.Price.Value.ToString("0,0") : "N/A";
+                                                }
+                                                @price KM
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="price">Na upit</div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="price">Oglas</div>
+                                    }
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-6 about-col">
+                <div class="about">
+                    <h2 class="heading text-right">o nama</h2>
+                    <h3 class="d-none">Nekretnine Sarajevo</h3>
+                    <p>
+                        LOCUS Nekretnine d.o.o. je agencija za posredovanje u prodaji nekretnina sa
+                        inovativnim pristupom u ovom poslu. Imamo obučene agente koji će raditi na prodaji
+                        Vaše nekretnine i spremni smo ponuditi profesionalan i odgovoran pristup kako
+                        bismo premašili očekivanja svih naših klijenata. Naglašavamo naše umijeće u
+                        oglašavanju na društvenim mrežama i web portalima.. Na kraju, naša upornost i aktivan
+                        rad sa kupcima su najbolja garancija uspjeha.
+                    </p>
+                    <p>ZAŠTO LOCUS nekretnine?</p>
+                    <p>
+                        - Poslovnica na jednoj od najprometnijih lokacija u gradu; Bulevar Meše Selimovića<br />
+                        - Velika zastupljenost na olx.ba;<br />
+                        - Oglašavanje na društvenim mrežama;<br />
+                        - Visokoobučeni agenti sa višegodišnjim iskustvom u prodaji nekretnina;<br />
+                        - Maksimalna angažiranost tokom cjelokupnog procesa prodaje;<br />
+                        - Naši agenti Vas prate sve do isplate cjelokupne kupoprodajne cijene
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+<article class="services">
+    <h2 class="heading blue text-right">usluge</h2>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="service">
+                <div class="img-cont">
+                    <img src="https://www.locus.ba/Content/images/prodaja.jpg" alt="Prodaja kuća, Sarajevo">
+                </div>
+                <div class="overlay">
+                    <p>Kuće</p>
+                    <a class="button" href="@Url.Action("Index", "Search", new { @propertyType = 2 })">pretraga</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="service">
+                <div class="img-cont">
+                    <img src="https://www.locus.ba/Content/images/novogradnja.jpg" alt="Novogradnja, Sarajevo">
+                </div>
+                <div class="overlay">
+                    <p>Stanovi</p>
+                    <a class="button" href="@Url.Action("Index", "Search", new { @propertyType = 1 })">pretraga</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="service">
+                <div class="img-cont">
+                    <img src="https://www.locus.ba/Content/images/zemljiste.jpg" alt="Zemljišta, Sarajevo">
+                </div>
+                <div class="overlay">
+                    <p>Zemljišta</p>
+                    <a class="button" href="@Url.Action("Index", "Search", new { @propertyType = 8 })">pretraga</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+
+<article class="cities pt-3 pb-5">
+    <div class="container">
+        <h2 class="heading text-center">naselja</h2>
+        <div class="row">
+            <div class="col-lg-4 col-sm-6">
+                <figure class="city-button">
+                    <img src="/DynamicContent/CityPartsHomepage/@Model.GlobalSettings.CityPart1Image" alt="Prodaja @Model.GlobalSettings.CityPart1Name, Sarajevo">
+                    <figcaption>
+                        <h2>@LocusNew.Helpers.LayoutGetValues.CityPart1Name()</h2>
+                        <p>@Model.GlobalSettings.CityPart1NumberOfListings nekretnina</p>
+                        <a href="@Url.Action("Index", "Search", new { @cityPartId = Model.GlobalSettings.CityPart1Id, @cityPart = Model.GlobalSettings.CityPart1Name })">nekretnine sarajevo</a>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <figure class="city-button">
+                    <img src="/DynamicContent/CityPartsHomepage/@Model.GlobalSettings.CityPart2Image" alt="Prodaja @Model.GlobalSettings.CityPart2Name, Sarajevo">
+                    <figcaption>
+                        <h2>@LocusNew.Helpers.LayoutGetValues.CityPart2Name()</h2>
+                        <p>@Model.GlobalSettings.CityPart2NumberOfListings nekretnina</p>
+                        <a href="@Url.Action("Index", "Search", new { @cityPartId = Model.GlobalSettings.CityPart2Id, @cityPart = Model.GlobalSettings.CityPart2Name })">nekretnine sarajevo</a>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <figure class="city-button">
+                    <img src="/DynamicContent/CityPartsHomepage/@Model.GlobalSettings.CityPart3Image" alt="Prodaja @Model.GlobalSettings.CityPart3Name, Sarajevo">
+                    <figcaption>
+                        <h2>@LocusNew.Helpers.LayoutGetValues.CityPart3Name()</h2>
+                        <p>@Model.GlobalSettings.CityPart3NumberOfListings nekretnina</p>
+                        <a href="@Url.Action("Index", "Search", new { @cityPartId = Model.GlobalSettings.CityPart3Id, @cityPart = Model.GlobalSettings.CityPart3Name })">nekretnine sarajevo</a>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <figure class="city-button">
+                    <img src="/DynamicContent/CityPartsHomepage/@Model.GlobalSettings.CityPart4Image" alt="Prodaja @Model.GlobalSettings.CityPart4Name, Sarajevo">
+                    <figcaption>
+                        <h2>@LocusNew.Helpers.LayoutGetValues.CityPart4Name()</h2>
+                        <p>@Model.GlobalSettings.CityPart4NumberOfListings nekretnina</p>
+                        <a href="@Url.Action("Index", "Search", new { @cityPartId = Model.GlobalSettings.CityPart4Id, @cityPart = Model.GlobalSettings.CityPart4Name })">nekretnine sarajevo</a>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <figure class="city-button">
+                    <img src="/DynamicContent/CityPartsHomepage/@Model.GlobalSettings.CityPart5Image" alt="Prodaja @Model.GlobalSettings.CityPart5Name, Sarajevo">
+                    <figcaption>
+                        <h2>@LocusNew.Helpers.LayoutGetValues.CityPart5Name()</h2>
+                        <p>@Model.GlobalSettings.CityPart5NumberOfListings nekretnina</p>
+                        <a href="@Url.Action("Index", "Search", new { @cityPartId = Model.GlobalSettings.CityPart5Id, @cityPart = Model.GlobalSettings.CityPart5Name })">nekretnine sarajevo</a>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <figure class="city-button">
+                    <img src="/DynamicContent/CityPartsHomepage/@Model.GlobalSettings.CityPart6Image" alt="Prodaja @Model.GlobalSettings.CityPart6Name, Sarajevo">
+                    <figcaption>
+                        <h2>@LocusNew.Helpers.LayoutGetValues.CityPart6Name()</h2>
+                        <p>@Model.GlobalSettings.CityPart6NumberOfListings nekretnina</p>
+                        <a href="@Url.Action("Index", "Search", new { @cityPartId = Model.GlobalSettings.CityPart6Id, @cityPart = Model.GlobalSettings.CityPart6Name })">nekretnine sarajevo</a>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </div>
+</article>
+
+<article class="contact">
+    <div class="container">
+        <h2 class="heading blue text-center">kontakt</h2>
+        <div class="container-fluid">
+            @using (Ajax.BeginForm("SendMessage", "Home", null, new AjaxOptions
+            {
+                HttpMethod = "POST",
+                InsertionMode = InsertionMode.Replace,
+                UpdateTargetId = "MessageCont"
+            }))
+            {
+                <div id="MessageCont" class="text-center">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.Message.Name, new { @class = "form-control", @placeholder = "Ime i prezime" })
+                                @Html.ValidationMessageFor(m => m.Message.Name)
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.Message.Email, new { @class = "form-control", @placeholder = "Email adresa" })
+                                @Html.ValidationMessageFor(m => m.Message.Email)
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.Message.PhoneNumber, new { @class = "form-control", @placeholder = "Broj telefona" })
+                                @Html.ValidationMessageFor(m => m.Message.PhoneNumber)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                @Html.TextAreaFor(m => m.Message.Message, new { @class = "form-control", @placeholder = "Poruka" })
+                                @Html.ValidationMessageFor(m => m.Message.Message)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center pt-3">
+                        @Html.AntiForgeryToken()
+                        <button class="button" type="submit" id="ShowingSubmitBtn">pošalji</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</article>
+
+@section scripts{
+    @Scripts.Render("~/bundles/jquiJS")
+    @Scripts.Render("/bundles/owlJS")
+    @Scripts.Render("/bundles/homeScript")
+}

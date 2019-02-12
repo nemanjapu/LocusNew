@@ -1,0 +1,708 @@
+﻿@model LocusNew.Core.AdminViewModels.EditListingViewModel
+@{
+    ViewBag.Title = "Uredi nekretninu";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    <meta http-equiv="Cache-control" content="no-cache">
+}
+
+@section styles{
+    @Styles.Render("~/Content/admin/select2Css")
+    <style>
+        #map-canvas {
+            height: 400px;
+        }
+    </style>
+    @if (Model.MultiRooms)
+    {
+        <style>
+            #MultiRoomsMulti {
+                display: block;
+            }
+
+            #MultiRoomsSingle {
+                display: none;
+            }
+        </style>
+    }
+    @if (Model.MultiBedrooms)
+    {
+        <style>
+            #MultiBedroomsMulti {
+                display: block;
+            }
+
+            #MultiBedroomsSingle {
+                display: none;
+            }
+        </style>
+    }
+    @if (Model.MultiBathrooms)
+    {
+        <style>
+            #MultiBathsMulti {
+                display: block;
+            }
+
+            #MultiBathsSingle {
+                display: none;
+            }
+        </style>
+    }
+    @if (Model.MultiSquareMeters)
+    {
+        <style>
+            #MultiSqMulti {
+                display: block;
+            }
+
+            #MultiSqSingle {
+                display: none;
+            }
+        </style>
+    }
+    @if (Model.MultiPrice)
+    {
+        <style>
+            #MultiPriceMulti {
+                display: block;
+            }
+
+            #MultiPriceSingle {
+                display: none;
+            }
+        </style>
+    }
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ9ITEowmHPfUzKt0uM8eMCJi4sqKVozs&libraries=places"></script>
+}
+
+<h2>
+    Uredi @Model.Address, @Model.CityPartName nekretninu
+</h2>
+@Html.ValidationSummary()
+
+@Html.Partial("AddNewCityPart")
+@Html.Partial("AddNewListingType")
+@Html.Partial("AddNewHouseOwner")
+
+@using (Html.BeginForm("SaveEditedListing", "ListingsManager", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="container-fluid">
+        <h5>Osnovne informacije</h5>
+        <div class="row">
+            <div class="col-sm-6 col-xl-3">
+                @Html.HiddenFor(m => m.Id)
+                <div class="form-group">
+                    <label>Adresa:</label>
+                    @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Dio grada:</label>
+                    <div class="row">
+                        <div class="col-10 pr-0">
+                            @Html.DropDownListFor(m => m.CityPartId, new SelectList(Model.CityParts, "Id", "Name"), "--------", new { @class = "form-control js-select2" })
+                            @Html.ValidationMessageFor(m => m.CityPartId)
+                        </div>
+                        <div class="col-2 pl-0">
+                            <button type="button" class="d-block" id="edit-city-part" data-toggle="modal" data-target="#AddNewCityPartModal">
+                                <i class="fa fa-pencil-square-o"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Cijena:</label>
+                    <div class="checkbox-cont pull-right">
+                        @Html.CheckBoxFor(m => m.MultiPrice, new { @class = "multi-chb-listing", id = "MultiPrice" })
+                        <label for="MultiPrice" class="multi-toggle"><span></span></label>
+                    </div>
+                    <div class="single-item" id="MultiPriceSingle">
+                        @Html.TextBoxFor(m => m.Price, new { @class = "form-control", type = "number" })
+                        @Html.ValidationMessageFor(m => m.Price)
+                    </div>
+                    <div class="multi-item" id="MultiPriceMulti">
+                        <div class="row">
+                            <div class="col-6">
+                                @Html.TextBoxFor(m => m.MultiPriceFrom, new { @class = "form-control", type = "number" })
+                                @Html.ValidationMessageFor(m => m.MultiPriceFrom)
+                            </div>
+                            <div class="col-6">
+                                @Html.TextBoxFor(m => m.MultiPriceTo, new { @class = "form-control", type = "number" })
+                                @Html.ValidationMessageFor(m => m.MultiPriceTo)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Cijena klijenta:</label>
+                    @Html.TextBoxFor(m => m.ClientPrice, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ClientPrice)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Broj ugovora:</label>
+                    @Html.TextBoxFor(m => m.ListingUniqueCode, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ListingUniqueCode)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Prodaja:</label>
+                    @Html.DropDownListFor(m => m.AdTypeId, new SelectList(Model.AdTypes, "Id", "Name"), "--------", new { @class = "form-control js-select2" })
+                    @Html.ValidationMessageFor(m => m.AdTypeId)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Tip nekretnine:</label>
+                    <div class="row">
+                        <div class="col-10 pr-0">
+                            @Html.DropDownListFor(m => m.PropertyTypeId, new SelectList(Model.PropertyTypes, "Id", "Name"), "--------", new { @class = "form-control js-select2" })
+                            @Html.ValidationMessageFor(m => m.PropertyTypeId)
+                        </div>
+                        <div class="col-2 pl-0">
+                            <button type="button" class="d-block" id="edit-city-part" data-toggle="modal" data-target="#AddNewCityListingType">
+                                <i class="fa fa-pencil-square-o"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Agent:</label>
+                    @Html.DropDownListFor(m => m.ApplicationUserId, new SelectList(Model.Agents, "Id", "FullName"), "--------", new { @class = "form-control js-select2" })
+                    @Html.ValidationMessageFor(m => m.ApplicationUserId)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Vlasnik:</label>
+                    <div class="row">
+                        <div class="col-10 pr-0">
+                            @Html.DropDownListFor(m => m.PropertyOwnerId, new SelectList(Model.PropertyOwners, "Id", "FullName"), "--------", new { @class = "form-control js-select2" })
+                            @Html.ValidationMessageFor(m => m.PropertyOwnerId)
+                        </div>
+                        <div class="col-2 pl-0">
+                            <button type="button" class="d-block" id="edit-city-part" data-toggle="modal" data-target="#newHouseOwner">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Ugovor od:</label>
+                    @Html.TextBoxFor(m => m.ContractFrom, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ContractFrom)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Ugovor do:</label>
+                    @Html.TextBoxFor(m => m.ContractTo, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ContractTo)
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xl-6">
+                        <div class="form-group">
+                            <label>Naslov:</label>
+                            @Html.TextAreaFor(m => m.Heading, new { @class = "form-control listing-summernote" })
+                            @Html.ValidationMessageFor(m => m.Heading)
+                        </div>
+                    </div>
+                    <div class="col-xl-6">
+                        <div class="form-group">
+                            <label>Opis:</label>
+                            @Html.TextAreaFor(m => m.Details, new { @class = "form-control listing-summernote" })
+                            @Html.ValidationMessageFor(m => m.Details)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group clearfix">
+                    <label>Broj soba:</label>
+                    <div class="checkbox-cont pull-right">
+                        @Html.CheckBoxFor(m => m.MultiRooms, new { @class = "multi-chb-listing", id = "MultiRooms" })
+                        <label for="MultiRooms" class="multi-toggle"><span></span></label>
+                    </div>
+                    <div class="single-item" id="MultiRoomsSingle">
+                        @Html.TextBoxFor(m => m.Rooms, new { @class = "form-control", type = "number", min = "0" })
+                        @Html.ValidationMessageFor(m => m.Rooms)
+                    </div>
+                    <div class="multi-item" id="MultiRoomsMulti">
+                        <div class="row">
+                            <div class="col-6">
+                                @Html.TextBoxFor(m => m.MultiRoomsFrom, new { @class = "form-control", type = "number", min = "0" })
+                                @Html.ValidationMessageFor(m => m.MultiRoomsFrom)
+                            </div>
+                            <div class="col-6">
+                                @Html.TextBoxFor(m => m.MultiRoomsTo, new { @class = "form-control", type = "number", min = "0" })
+                                @Html.ValidationMessageFor(m => m.MultiRoomsTo)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group clearfix">
+                    <label>Broj spavaćih soba:</label>
+                    <div class="checkbox-cont pull-right">
+                        @Html.CheckBoxFor(m => m.MultiBedrooms, new { @class = "multi-chb-listing", id = "MultiBedrooms" })
+                        <label for="MultiBedrooms" class="multi-toggle"><span></span></label>
+                    </div>
+                    <div class="single-item" id="MultiBedroomsSingle">
+                        @Html.TextBoxFor(m => m.Bedrooms, new { @class = "form-control", type = "number", min = "0" })
+                        @Html.ValidationMessageFor(m => m.Bedrooms)
+                    </div>
+                    <div class="multi-item" id="MultiBedroomsMulti">
+                        <div class="row">
+                            <div class="col-6">
+                                @Html.TextBoxFor(m => m.MultiBedroomsFrom, new { @class = "form-control", type = "number", min = "0" })
+                                @Html.ValidationMessageFor(m => m.MultiBedroomsFrom)
+                            </div>
+                            <div class="col-6">
+                                @Html.TextBoxFor(m => m.MultiBedroomsTo, new { @class = "form-control", type = "number", min = "0" })
+                                @Html.ValidationMessageFor(m => m.MultiBedroomsTo)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Broj kupatila:</label>
+                    <div class="checkbox-cont pull-right">
+                        @Html.CheckBoxFor(m => m.MultiBathrooms, new { @class = "multi-chb-listing", id = "MultiBathrooms" })
+                        <label for="MultiBathrooms" class="multi-toggle"><span></span></label>
+                    </div>
+                    <div class="single-item" id="MultiBathsSingle">
+                        @Html.TextBoxFor(m => m.Bathrooms, new { @class = "form-control", type = "number", min = "0" })
+                        @Html.ValidationMessageFor(m => m.Bathrooms)
+                    </div>
+                    <div class="multi-item" id="MultiBathsMulti">
+                        <div class="row">
+                            <div class="col-6">
+                                @Html.TextBoxFor(m => m.MultiBathFrom, new { @class = "form-control", type = "number", min = "0" })
+                                @Html.ValidationMessageFor(m => m.MultiBathFrom)
+                            </div>
+                            <div class="col-6">
+                                @Html.TextBoxFor(m => m.MultiBathTo, new { @class = "form-control", type = "number", min = "0" })
+                                @Html.ValidationMessageFor(m => m.MultiBathTo)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Broj toaleta:</label>
+                    @Html.TextBoxFor(m => m.Toilete, new { @class = "form-control", type = "number", min = "0" })
+                    @Html.ValidationMessageFor(m => m.Toilete)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label><a style="color: #333; cursor: pointer; padding: 0 10px;" data-placement="bottom" tabindex="0" class="popover-dismiss" role="button" data-toggle="popover" data-trigger="focus" title="Informacija" data-html="true" data-content="Za prizemlje unesite <b>0</b><br>Za suteren unesite <b>50</b><br>Za potkrovlje unesite <b>100</b><br><br>Na korisničkom dijelu će biti prikazano kao tekst."><i class="fa fa-question-circle"></i></a> Sprat:</label>
+                    @Html.TextBoxFor(m => m.Floor, new { @class = "form-control", type = "number", min = "0" })
+                    @Html.ValidationMessageFor(m => m.Bathrooms)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Sprat tekst:</label>
+                    @Html.TextBoxFor(m => m.FloorText, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.FloorText)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Ukupno spratova:</label>
+                    @Html.TextBoxFor(m => m.TotalFloorNumber, new { @class = "form-control", type = "number", min = "0" })
+                    @Html.ValidationMessageFor(m => m.TotalFloorNumber)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Površina nekretnine:</label>
+                    <div class="checkbox-cont pull-right">
+                        @Html.CheckBoxFor(m => m.MultiSquareMeters, new { @class = "multi-chb-listing", id = "MultiSquareMeters" })
+                        <label for="MultiSquareMeters" class="multi-toggle"><span></span></label>
+                    </div>
+                    <div class="single-item" id="MultiSqSingle">
+                        @Html.TextBoxFor(m => m.SquareMeters, new { @class = "form-control", type = "number", min = "0" })
+                        @Html.ValidationMessageFor(m => m.SquareMeters)
+                    </div>
+                    <div class="multi-item" id="MultiSqMulti">
+                        <div class="row">
+                            <div class="col-6">
+                                @Html.TextBoxFor(m => m.MultiSquareMetersFrom, new { @class = "form-control", type = "number", min = "0" })
+                                @Html.ValidationMessageFor(m => m.MultiSquareMetersFrom)
+                            </div>
+                            <div class="col-6">
+                                @Html.TextBoxFor(m => m.MultiSquareMetersTo, new { @class = "form-control", type = "number", min = "0" })
+                                @Html.ValidationMessageFor(m => m.MultiSquareMetersTo)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Povrašina parcele:</label>
+                    @Html.TextBoxFor(m => m.LotSquareMeters, new { @class = "form-control", type = "number", min = "0" })
+                    @Html.ValidationMessageFor(m => m.LotSquareMeters)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Povrašina dvorišta:</label>
+                    @Html.TextBoxFor(m => m.YardSquareMeters, new { @class = "form-control", type = "number", min = "0" })
+                    @Html.ValidationMessageFor(m => m.YardSquareMeters)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Godina izgradnje:</label>
+                    @Html.TextBoxFor(m => m.YearBuilt, new { @class = "form-control", type = "number", min = "0" })
+                    @Html.ValidationMessageFor(m => m.YearBuilt)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Godina zadnje adaptacije:</label>
+                    @Html.TextBoxFor(m => m.YearOfLastAdaptation, new { @class = "form-control", type = "number", min = "0" })
+                    @Html.ValidationMessageFor(m => m.YearOfLastAdaptation)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Stolarija:</label>
+                    @Html.DropDownListFor(m => m.Joinery, new SelectList(Model.JoineryDropDown, "Value", "Text"), "--------", new { @class = "form-control js-select2" })
+                    @Html.ValidationMessageFor(m => m.Joinery)
+                </div>
+            </div>
+        </div>
+        <hr />
+        <h5>Ostale informacije</h5>
+        <div class="row">
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Elevator)
+                        <label for="Elevator">Lift</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Balcony)
+                        <label for="Balcony">Balkon</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Terrace)
+                        <label for="Terrace">Terasa</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Loggia)
+                        <label for="Loggia">Lođa</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Attic)
+                        <label for="Attic">Tavan</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Basement)
+                        <label for="Basement">Podrum</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Pantry)
+                        <label for="Pantry">Ostava</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Water)
+                        <label for="Water">Voda</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Gas)
+                        <label for="Gas">Plin</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Kanalizacija:</label>
+                    @Html.DropDownListFor(m => m.Canalization, new SelectList(Model.CanalizationDropDown, "Value", "Text"), new { @class = "form-control js-select2" })
+                    @Html.ValidationMessageFor(m => m.Canalization)
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.TelephoneConnection)
+                        <label for="TelephoneConnection">Telefonski priključak</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Electricity)
+                        <label for="Electricity">Električna energija</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.CentralHeatingToplane)
+                        <label for="CentralHeatingToplane">Cen. grijanje - Toplane</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Etažno grijanje:</label>
+                    @Html.DropDownListFor(m => m.CentralHeatingEtazno, new SelectList(Model.CentralHeatingEtaznoDropDown, "Value", "Text"), new { @class = "form-control js-select2" })
+                    @Html.ValidationMessageFor(m => m.CentralHeatingEtazno)
+                </div>
+
+                <div class="form-group">
+                    <label>Alterntivno grijanje:</label>
+                    @Html.DropDownListFor(m => m.AlternativeHeating, new SelectList(Model.AlternativeHeatingDropDown, "Value", "Text"), new { @class = "form-control js-select2" })
+                    @Html.ValidationMessageFor(m => m.AlternativeHeating)
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.CableTV)
+                        <label for="CableTV">Kablovska TV</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Internet)
+                        <label for="Internet">Internet</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Furniture)
+                        <label for="Furniture">Namještaj</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Videophone)
+                        <label for="Videophone">Videofon</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Interphone)
+                        <label for="Interphone">Interfon</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.PrivateParking)
+                        <label for="PrivateParking">Privatni parking</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.Garage)
+                        <label for="Garage">Garaža</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.ArmoredDoor)
+                        <label for="ArmoredDoor">Blindo vrata</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.NewKitchen)
+                        <label for="NewKitchen">Nova kuhinja</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.AirConditioner)
+                        <label for="AirConditioner">Klima uređaj</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Google ključne riječi:</label>
+                    @Html.TextBoxFor(m => m.MetaKeyWords, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.MetaKeyWords)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.isActive)
+                        <label for="isActive">Prikaži na stranici</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.isReserved)
+                        <label for="isReserved">Rezervisano</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Izvor:</label>
+                    @Html.DropDownListFor(m => m.SourceId, new SelectList(Model.Sources, "Id", "Name"), "--------", new { @class = "form-control js-select2" })
+                    @Html.ValidationMessageFor(m => m.SourceId)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Iznos provizije:</label>
+                    @Html.TextBoxFor(m => m.CommissionFee, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.CommissionFee)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Prodajna cijena:</label>
+                    @Html.TextBoxFor(m => m.SellingPrice, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.SellingPrice)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Način finansiranja:</label>
+                    @Html.DropDownListFor(m => m.FinanceType, new SelectList(Model.FinanceTypeDropDown, "Value", "Text"), "--------", new { @class = "form-control js-select2" })
+                    @Html.ValidationMessageFor(m => m.FinanceType)
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="form-group">
+                    <label>Datum objave:</label>
+                    @Html.TextBoxFor(m => m.Published, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Published)
+                </div>
+            </div>
+            <div class="col-12">
+                <hr />
+                <h5>Slike</h5>
+                <div class="row dragableImagesContainer" id="ImagesContainer">
+                    <div class="sortable-image upload-label col-xl-2 col-sm-6 pb-3">
+                        <label for="images" class="label-for-images">
+                            <img src="~/Areas/Admin/Content/images/upload-icon.png" alt="Odaberite slike" />
+                        </label>
+                        <input style="padding: 3px;" class="form-control d-none" type="file" name="file" multiple="multiple" accept="image/*" id="images">
+                    </div>
+                    @foreach (var s in Model.EditImagesList)
+                    {
+                        <div class="sortable-image col-xl-2 col-sm-6" id="@s.Id">
+                            <div class="card mb-3">
+                                <a id="DeleteImageButton" role="button" href="javascript:void(0);" class="btn btn-danger delete-image">
+                                    <i class="fa fa-times"></i>
+                                    <input type="hidden" name="ImageId" class="ImageId" value="@s.Id" />
+                                </a>
+                                <img class="card-img-top card-img-bottom draggableHandleImage" src="/@s.FilePath/@s.FileName" alt="@s.FileName">
+                                <span class="edit-img-order">@s.FileNameNoExt</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-sm-12">
+                <h5>Lokacija nekretnine</h5>
+                @Html.HiddenFor(m => m.Longitude)
+                @Html.HiddenFor(m => m.Latidute)
+                <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+                <div id="map-canvas"></div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-12">
+                <label>Bilješke:</label>
+                @Html.TextAreaFor(m => m.NotesForAgents, new { @class = "form-control listing-summernote" })
+            </div>
+        </div>
+        <div class="row mt-3">
+            @if (Model.isSold == true)
+            {
+                <div class="col-sm-6">
+                    <div class="inputGroup pt-0">
+                        @Html.CheckBoxFor(m => m.isSold)
+                        <label for="isSold">Prodan</label>
+                    </div>
+                </div>
+            }
+            <div class="col-sm-6">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-block btn-success btn-save-listing"><i class="fa fa-check" aria-hidden="true"></i></button>
+            </div>
+        </div>
+    </div>
+}
+@section scripts{
+    @Scripts.Render("~/bundles/mapScript")
+    @Scripts.Render("~/bundles/Select2js")
+    @Scripts.Render("~/bundles/ListingJS")
+    @Scripts.Render("~/bundles/editListingJS")
+    <script>
+        GetLatLonOnEditListing(@Model.Latidute, @Model.Longitude)
+    </script>
+}

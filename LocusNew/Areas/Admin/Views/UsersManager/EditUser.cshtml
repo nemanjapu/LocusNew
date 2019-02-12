@@ -1,0 +1,147 @@
+﻿@model LocusNew.Core.AdminViewModels.AddUserViewModel
+@{
+    ViewBag.Title = "Izmijeni korisnika";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Izmijeni korisnika</h2>
+<div class="container-fluid">
+    @Html.ValidationSummary()
+    @using (Html.BeginForm("SaveEditedUser", "UsersManager", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.HiddenFor(m => m.Id)
+        <div class="row">
+            <div class="col-xl-6">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Slika</label>
+                            <div>
+                                @Html.TextBoxFor(m => m.File, new { @class = "image-input-field inputfile", type = "file", data_multiple_caption = "" })
+                                <label class="image-input-label" for="File">
+                                    <figure>
+                                        <img id="UserPhoto" src="https://www.locus.ba/DynamicContent/UserImages/@Model.ImageName" alt="Preview Image" />
+                                    </figure>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Kartica</label>
+                            <div>
+                                @Html.TextBoxFor(m => m.AgentCardFile, new { @class = "image-input-field inputfile", type = "file", data_multiple_caption = "" })
+                                <label class="image-input-label" for="AgentCardFile">
+                                    <figure>
+                                        <img id="AgentCardFilePreview" src="https://www.locus.ba/DynamicContent/UserImages/Cards/@Model.AgentCardImageName" alt="Preview Image" />
+                                    </figure>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Ime</label>
+                            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.FirstName)
+                        </div>
+                        <div class="form-group">
+                            <label>Prezime</label>
+                            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.LastName)
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Email)
+                        </div>
+                        <div class="form-group">
+                            <label>Broj Telefona:</label>
+                            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.PhoneNumber)
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Titula:</label>
+                            @Html.TextBoxFor(m => m.Designation, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Designation)
+                        </div>
+                        <div class="form-group">
+                            <div class="inputGroup">
+                                @Html.CheckBoxFor(m => m.isAdmin)
+                                <label for="isAdmin">Administrator</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="inputGroup">
+                                @Html.CheckBoxFor(m => m.isAgent)
+                                <label for="isAgent">Agent</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="inputGroup">
+                                @Html.CheckBoxFor(m => m.isActive)
+                                <label for="isActive">Aktivan</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-5 m-auto">
+                <div class="row pt-4">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <a data-toggle="modal" data-target="#ChangePasswordModal" href="#" class="btn btn-block btn-primary">Promijeni lozinku</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        @Html.AntiForgeryToken()
+                        <input type="submit" class="btn btn-block btn-primary" value="Spasi" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@Html.Action("ChangePassword", new { @id = Model.Id })
+@section scripts{
+    <script>
+        document.getElementById("File").onchange = function () {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // get loaded data and render thumbnail.
+                document.getElementById("UserPhoto").src = e.target.result;
+            };
+
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+        };
+    </script>
+
+    <script>
+        document.getElementById("AgentCardFile").onchange = function () {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // get loaded data and render thumbnail.
+                document.getElementById("AgentCardFilePreview").src = e.target.result;
+            };
+
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+        };
+    </script>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <script>
+            $('#ChangePasswordModal').modal();
+        </script>
+    }
+}

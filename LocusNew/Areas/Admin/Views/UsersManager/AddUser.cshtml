@@ -1,0 +1,140 @@
+﻿@model LocusNew.Core.AdminViewModels.AddUserViewModel
+@{
+    ViewBag.Title = "Dodaj korisnika";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Dodaj novog korisnika</h2>
+<div class="container-fluid">
+    @Html.ValidationSummary()
+    @using (Html.BeginForm("SaveNewUser", "UsersManager", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.HiddenFor(m => m.Id)
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Slika</label>
+                    <div>
+                        @Html.TextBoxFor(m => m.File, new { @class = "image-input-field inputfile required", type = "file", data_multiple_caption = "", data_rule_required = "true", data_msg_required = "Molimo odaberite sliku!" })
+                        <label class="image-input-label" for="File">
+                            <figure>
+                                <img id="UserPhoto" src="@Model.ImageName" alt="Preview Image" />
+                            </figure>
+                        </label>
+                        <span class="field-validation-valid" data-valmsg-for="File" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Kartica</label>
+                    <div>
+                        @Html.TextBoxFor(m => m.AgentCardFile, new { @class = "image-input-field inputfile required", type = "file", data_multiple_caption = "", data_rule_required = "true", data_msg_required = "Molimo odaberite karticu!" })
+                        <label class="image-input-label" for="AgentCardFile">
+                            <figure>
+                                <img id="AgentCardFilePreview" src="@Model.AgentCardImageName" alt="Preview Image" />
+                            </figure>
+                        </label>
+                        <span class="field-validation-valid" data-valmsg-for="AgentCardFile" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Ime</label>
+                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.FirstName)
+                </div>
+                <div class="form-group">
+                    <label>Prezime</label>
+                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.LastName)
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Email)
+                </div>
+                <div class="form-group">
+                    <label>Broj Telefona:</label>
+                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.PhoneNumber)
+                </div>
+                <div class="form-group">
+                    <label>Titula:</label>
+                    @Html.TextBoxFor(m => m.Designation, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Designation)
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.isAdmin)
+                        <label for="isAdmin">Administrator</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.isAgent)
+                        <label for="isAgent">Agent</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="inputGroup">
+                        @Html.CheckBoxFor(m => m.isActive)
+                        <label for="isActive">Aktivan</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Lozinka:</label>
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Password)
+                </div>
+                <div class="form-group">
+                    <label>Ponovite lozinku:</label>
+                    @Html.PasswordFor(m => m.PasswordRepeated, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.PasswordRepeated)
+                </div>
+                @Html.AntiForgeryToken()
+                <input type="submit" class="btn btn-block btn-primary" value="Spasi" />
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts{
+    <script>
+        document.getElementById("File").onchange = function () {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // get loaded data and render thumbnail.
+                document.getElementById("UserPhoto").src = e.target.result;
+            };
+
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+        };
+    </script>
+
+    <script>
+        document.getElementById("AgentCardFile").onchange = function () {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // get loaded data and render thumbnail.
+                document.getElementById("AgentCardFilePreview").src = e.target.result;
+            };
+
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+        };
+    </script>
+    <script>
+        $("#File").validate({
+            required: "Slika je obavezno polje!"
+        });
+        $("#AgentCardFile").validate({
+            required: "Kartica je obavezno polje!"
+        });
+    </script>
+}

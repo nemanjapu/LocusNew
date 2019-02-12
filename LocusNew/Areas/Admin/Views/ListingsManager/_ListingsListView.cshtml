@@ -1,0 +1,64 @@
+﻿@model IEnumerable<LocusNew.Core.AdminViewModels.AdminListingsListViewModel>
+<div class="row">
+    @foreach (var m in Model)
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="row">
+                    <div class="col-xl-3">
+                        <img class="card-img-top img-tile-view" src="https://www.locus.ba/@m.ImagePath/@m.ImageName" alt="@m.ImageName">
+                        @if (m.isReserved)
+                        {
+                            <img src="/Content/Images/reserved.png" alt="Rezervisano" class="img-reserved" />
+                        }
+                    </div>
+                    <div class="col-xl-9 pr-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <h6 class="card-title mb-3 mb-sm-0 text-sm-left text-center">Informacije o nekretnini</h6>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h6 class="card-title text-sm-right text-center mb-0">Agent: @m.AgentName</h6>
+                                </div>
+                            </div>
+                            <hr />
+                        </div>
+                        <div class="row text-sm-left text-center">
+                            <div class="col-sm-4">
+                                <div class="card-body py-0">
+                                    <p class="mb-0"><b>Šifra:</b></p>
+                                    <p>@m.ListingUniqueCode</p>
+                                    <p class="mb-0"><b>Adresa:</b></p>
+                                    <p>@m.Address</p>
+                                    <p class="mb-0"><b>Dio grada:</b></p>
+                                    <p>@m.CityPart</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="card-body py-0">
+                                    <p class="mb-0"><b>Tip akcije:</b></p>
+                                    <p>@m.LeaseSale</p>
+                                    <p class="mb-0"><b>Tip nekretnine:</b></p>
+                                    <p>@m.PropertyType</p>
+                                    <p class="mb-0"><b>Cijena:</b></p>
+                                    <p>
+                                        @{string price = m.Price.HasValue ? m.Price.Value.ToString("0,0") : "N/A";}
+                                        @price KM
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="card-body py-0 text-sm-right text-center">
+                                    <a href="@Url.Action("EditListing", "ListingsManager", new { @id = m.Id })" class="btn btn-primary d-inline-block mb-4 w-75">Uredi</a>
+                                    <a href="@Url.Action("SetAsSold", "ListingsManager", new { @id = m.Id })" class="btn btn-primary d-inline-block mb-4 w-75">Prodano</a>
+                                    <button id="DeleteListingButton" type="button" class="btn btn-primary d-inline-block mb-xl-0 mb-4 w-75" data-listingid="@m.Id" data-toggle="modal" data-target="#DeleteListingModal">Izbriši</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

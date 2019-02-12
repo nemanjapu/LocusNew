@@ -1,0 +1,45 @@
+﻿@model LocusNew.Core.AdminViewModels.AdminSearchListingsViewModel
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Aktivne nekretnine";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section styles{
+    @Styles.Render("~/Content/admin/select2Css")
+}
+
+<h2>Aktivne nekretnine</h2>
+
+<div class="container-fluid">
+    <div class="pt-3">
+        @using (Html.BeginForm("Index", "ListingsManager", FormMethod.Get))
+        {
+            @Html.Partial("_ListingsSearchFormPartial", Model.SearchForm)
+        }
+    </div>
+
+    @Html.Partial("_ListingsTilesView", Model.ListingsList)
+
+    @Html.PagedListPager(Model.ListingsList, page => Url.Action("Index", new {
+    page,
+    currentFilter = ViewBag.CurrentFilter,
+    sortOrder = Model.SearchForm.selectedSortOrder,
+    @listingNumber = Model.SearchForm.selectedListingNumber,
+    @agent = Model.SearchForm.AgentId,
+    @cityPartId = Model.SearchForm.CityPartId,
+    @propertyType = Model.SearchForm.PropertyTypeId,
+    @adType = Model.SearchForm.selectedSaleLease,
+    @beds = Model.SearchForm.selectedBeds,
+    @floor = Model.SearchForm.selectedFloor,
+    @minPrice = Model.SearchForm.selectedMinPrice,
+    @maxPrice = Model.SearchForm.selectedMaxPrice
+}))
+</div>
+
+@Html.Partial("_ListingDeleteConfirmation")
+
+@section scripts{
+    @Scripts.Render("~/bundles/Select2js")
+    @Scripts.Render("~/bundles/searchAdminListings")
+}

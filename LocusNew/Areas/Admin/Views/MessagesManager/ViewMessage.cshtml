@@ -1,0 +1,12 @@
+﻿@model LocusNew.Core.Models.Lead
+@{
+    ViewBag.Title = "Pregled poruke";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Poruka</h2>
+
+<p><b>Ime i prezime:</b> @Model.Name</p>
+<p><b>Broj telefona:</b> @Model.PhoneNumber</p>
+<p><b>Email:</b> @Model.Email</p>
+<p><b>Sadržaj:</b> @Model.Message</p>

@@ -1,0 +1,47 @@
+﻿@using LocusNew.Core.ViewModels
+@model LoginViewModel
+@{
+    Layout = null;
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Login - Locus Nekretnine</title>
+    @Styles.Render("~/Content/Bootstrap")
+    @Styles.Render("~/Content/AdminCSS")
+</head>
+
+<body class="login-body">
+    <div class="login p-5">
+        <h2 class="mb-3">Locus Nekretnine</h2>
+        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <label for="Email">E-mail adresa</label>
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control border-dark" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Lozinka</label>
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control border-dark" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <div class="inputGroup">
+                    @Html.CheckBoxFor(m => m.RememberMe)
+                    <label class="border-dark" for="RememberMe">Zapamti me</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Logiraj se" class="btn btn-primary" />
+            </div>
+        }
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/AdminScripts")
+</body>

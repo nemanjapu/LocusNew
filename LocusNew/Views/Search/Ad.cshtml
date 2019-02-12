@@ -1,0 +1,76 @@
+﻿@using System.Text.RegularExpressions
+@using LocusNew.Helpers
+@model LocusNew.Core.ViewModels.ListingDetailsViewModel
+@{
+    var ogDescription = Regex.Replace(Model.Listing.Heading.ToString(), "<[^>]*>", string.Empty);
+    var imageNameNoSpaces = Regex.Replace(Model.Listing.ImagePreview, " ", "%20");
+    var imagePathNoSpaces = Regex.Replace(Model.Listing.ImagePreviewPath, " ", "%20");
+}
+@section metatags{
+    <meta name="keywords" content="@Model.Listing.MetaKeywords" />
+    <meta property="og:url" content="https://www.locus.ba/search/listing/@Model.Listing.Id" />
+    <meta property="og:title" content="@Model.Listing.PropertyType.Name, @Model.Listing.Address, @Model.Listing.CityPart.Name - Locus Nekretnine" />
+    <meta property="og:description" content="@ogDescription" />
+    <meta property="og:image" content="https://www.locus.ba/@imagePathNoSpaces/@imageNameNoSpaces" />
+    <meta property="og:image:alt" content="@Model.Listing.PropertyType.Name, @Model.Listing.Address, @Model.Listing.CityPart.Name - Locus Nekretnine" />
+    <meta property="og:type" content="website" />
+    <meta property="fb:app_id" content="238576326796686" />
+}
+@{
+
+    ViewBag.Title = "Oglas";
+
+    Layout = "~/Views/Shared/_LayoutInner.cshtml";
+}
+@section styles{
+    @Styles.Render("~/Content/owlCSS")
+    @Styles.Render("~/Content/lightBoxCss")
+    @Styles.Render("~/Content/datepickerCss")
+}
+<div class="container-fluid listing-details-cont">
+    <div class="row">
+        <div class="col-xl-8">
+            <h1 class="heading blue">Oglas</h1>
+            <div class="listing-desc">@Html.Raw(Model.Listing.Heading)</div>
+            <div id="listingImages">
+                @foreach (var image in Model.Listing.Images)
+                {
+                    <img class="d-block w-100" src="https://www.locus.ba/@image.FilePath/@image.FileName">
+                }
+            </div>
+            <p>@Html.Raw(Model.Listing.Details)</p>
+        </div>
+        <div class="col-xl-4">
+            <div class="side-section">
+                <div id="listing-map"></div>
+            </div>
+            <div class="side-section">
+                <h1 class="heading blue small text-center">Vaš agent</h1>
+                <div class="text-center">
+                    <img class="mb-3 mw-100" src="https://www.locus.ba/DynamicContent/UserImages/@Model.Listing.ApplicationUser.ImageName" alt="@Model.Listing.ApplicationUser.ImageName" />
+                </div>
+                <h1 class="heading blue small text-center">@Model.Listing.ApplicationUser.FullName</h1>
+                <div class="text-center text-dark"><a class="text-dark" href="tel:@Model.Listing.ApplicationUser.PhoneNumber"><i class="fas fa-phone"></i> @Model.Listing.ApplicationUser.PhoneNumber</a></div>
+                <div class="text-center mb-2"><a class="text-dark" href="mailto:@Model.Listing.ApplicationUser.Email"><i class="fas fa-at"></i> @Model.Listing.ApplicationUser.Email</a></div>
+                <div class="text-center" style="font-size: 30px;">
+                    <a href="tel:@Model.Listing.ApplicationUser.PhoneNumber" class="mx-1"><i class="fab fa-viber"></i></a>
+                    <a style="font-size: 32px;" href="tel:@Model.Listing.ApplicationUser.PhoneNumber" class="mx-1"><i class="fab fa-whatsapp"></i></a>
+                    <a href="tel:@Model.Listing.ApplicationUser.PhoneNumber" class="mx-1"><img class="imo-icon" src="https://www.locus.ba/Content/Images/imo-ico.png" alt="imo" /></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ9ITEowmHPfUzKt0uM8eMCJi4sqKVozs&libraries=places"></script>
+    @Scripts.Render("~/bundles/owlJS")
+    @Scripts.Render("~/bundles/lightboxJS")
+    @Scripts.Render("~/bundles/jquiJS")
+    @Scripts.Render("~/bundles/single-listingScript")
+
+    <script>
+        GetTodaysDate(@DateTime.Now.ToShortDateString());
+        GetDefaultBounds(@Model.Listing.Latidute, @Model.Listing.Longitude);
+    </script>
+}

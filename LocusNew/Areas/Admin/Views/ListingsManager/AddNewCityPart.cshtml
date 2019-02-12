@@ -1,0 +1,31 @@
+﻿<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="AddNewCityPartModal" aria-hidden="true" id="AddNewCityPartModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Uredi dijelove grada</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xl-12 mb-4">
+                        <div id="addCityPartFormResult">
+                            <h6>Dodaj novi dio grada</h6>
+                            <div class="form-group">
+                                <input type="text" name="newCityPartName" id="newCityPartName" value="" class="form-control" />
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="SaveNewCityPart();">Spasi</button>
+                    </div>
+                    <div class="col-xl-12">
+                        <h6>Izbriši postojeći dio grada</h6>
+                        <ul class="list-group-flush pl-0" id="CityPartsDeleteList">
+                            @*generate with ajax*@
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

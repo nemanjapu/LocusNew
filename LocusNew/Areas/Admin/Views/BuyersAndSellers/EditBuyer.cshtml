@@ -1,0 +1,50 @@
+﻿@model LocusNew.Core.AdminViewModels.BuyersViewModel
+@{
+    ViewBag.Title = "Izmijeni kupca";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Izmijeni kupca</h2>
+
+@using (Html.BeginForm("SaveEditedBuyer", "BuyersAndSellers", FormMethod.Post))
+{
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="form-group">
+                @Html.HiddenFor(m => m.Id)
+                <label>Ime:</label>
+                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.FirstName)
+            </div>
+            <div class="form-group">
+                <label>Prezime:</label>
+                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.LastName)
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+            <div class="form-group">
+                <label>Telefon:</label>
+                @Html.TextBoxFor(m => m.Phone, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Phone)
+            </div>
+            <div class="form-group">
+                <label>Adresa:</label>
+                @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Address)
+            </div>
+            <div class="form-group">
+                <label>Broj lične karte:</label>
+                @Html.TextBoxFor(m => m.IdNumber, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.IdNumber)
+            </div>
+            <div class="form-group">
+                @Html.AntiForgeryToken()
+                <input type="submit" value="Spasi" class="btn btn-block btn-primary" />
+            </div>
+        </div>
+    </div>
+}

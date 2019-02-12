@@ -1,0 +1,63 @@
+﻿@model IEnumerable<LocusNew.Core.Models.Lead>
+@{
+    ViewBag.Title = "Poruke";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Poruke</h2>
+
+<div class="table-overflow">
+    <table class="table table-bordered datatable-table" style="width:100%">
+        <thead>
+            <tr>
+                <th>Primljeno</th>
+                <th>Ime i prezime</th>
+                <th>Broj Telefona</th>
+                <th>Email</th>
+                <th>Detalji</th>
+                <th>Izbriši</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td data-order="@s.Date.ToString("yyyy-MM-dd HH:mm")">@s.Date.ToString("dd.MM.yyyy. HH:mm")</td>
+                    <td>@s.Name</td>
+                    <td>@s.PhoneNumber</td>
+                    <td>@s.Email</td>
+                    <td><a class="table-anchor" href="@Url.Action("ViewMessage", "MessagesManager", new { @id = s.Id })">Pogledaj</a></td>
+                    <td>
+                        @using (Html.BeginForm("DeleteMessage", "MessagesManager", FormMethod.Post, new { @class = "DeleteListingForm" }))
+                        {
+                            var modalId = "deleteListing" + s.Id;
+                            <input type="hidden" name="Id" value="@s.Id" />
+                            <a class="table-anchor" id="deleteListingBtn" data-toggle="modal" data-target="#@modalId" href="javascript:void(0);"><i class="fa fa-trash" aria-hidden="true"></i></a>
+
+                            <div class="modal fade" tabindex="-1" role="dialog" id="@modalId">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="text-center text-danger mb-4 info-icon">
+                                                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                            </div>
+                                            <h5 class="text-center">Da li ste sigurni da želite izbrisati ovaj zapis?</h5>
+                                        </div>
+                                        <div class="modal-footer">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger m-auto" id="ConfirmDelete">Izbriši</button>
+                                            <button type="button" class="btn btn-light m-auto" data-dismiss="modal">Poništi</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@section scripts{
+    @Scripts.Render("~/bundles/dataTableInit")
+}

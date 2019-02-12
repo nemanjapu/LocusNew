@@ -1,0 +1,191 @@
+﻿@model LocusNew.Core.AdminViewModels.GlobalSettingsViewModel
+@{
+    ViewBag.Title = "Globalne postavke";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@section styles{
+    <style>
+        .image-input-label {
+            height: 40vh;
+        }
+
+            .image-input-label img {
+                height: 100%;
+                object-fit: cover;
+            }
+    </style>
+    @Styles.Render("~/Content/admin/select2Css")
+}
+<h2>Globalne postavke</h2>
+
+@using (Html.BeginForm("SaveSettings", "GlobalSettings", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary()
+    <div class="row">
+        <div class="col-sm-6">
+            @Html.HiddenFor(m => m.Id)
+            <div class="form-group">
+                <label>Broj telefona:</label>
+                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.PhoneNumber)
+            </div>
+            <div class="form-group">
+                <label>Fax:</label>
+                @Html.TextBoxFor(m => m.FaxNumber, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.FaxNumber)
+            </div>
+            <div class="form-group">
+                <label>Adresa:</label>
+                @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Address)
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+            <div class="form-group">
+                <label>O firmi:</label>
+                @Html.TextAreaFor(m => m.AboutUs, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.AboutUs)
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label>Facebook link:</label>
+                @Html.TextBoxFor(m => m.FacebookLink, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.FacebookLink)
+            </div>
+            <div class="form-group">
+                <label>Instagram link:</label>
+                @Html.TextBoxFor(m => m.InstagramLink, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.InstagramLink)
+            </div>
+            <div class="form-group">
+                <label>Twitter link:</label>
+                @Html.TextBoxFor(m => m.TwitterLink, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.TwitterLink)
+            </div>
+            <div class="form-group">
+                <label>Pinterest link:</label>
+                @Html.TextBoxFor(m => m.PinterestLink, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.PinterestLink)
+            </div>
+            <div class="form-group">
+                <label>Google plus link:</label>
+                @Html.TextBoxFor(m => m.GooglePlusLink, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.GooglePlusLink)
+            </div>
+            <div class="form-group">
+                <label>Linkedin link:</label>
+                @Html.TextBoxFor(m => m.LinkedinLink, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.LinkedinLink)
+            </div>
+            <div class="form-group">
+                <label>Youtube link:</label>
+                @Html.TextBoxFor(m => m.YoutubeLink, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.YoutubeLink)
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h2>Naselja na početnoj stranici</h2>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="form-group">
+                <label>Naselje 1</label>
+                @Html.DropDownListFor(m => m.CityPart1Id, new SelectList(Model.CityParts, "Id", "Name"), "--------", new { @class = "form-control mb-3 global-settings-select" })
+                <div>
+                    @Html.TextBoxFor(m => m.File1, new { @class = "image-input-field inputfile", type = "file", data_multiple_caption = "" })
+                    <label class="image-input-label" for="File1">
+                        <figure>
+                            <img id="File1img" src="/DynamicContent/CityPartsHomepage/@Model.CityPart1Image" alt="Preview Image" />
+                        </figure>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="form-group">
+                <label>Naselje 2</label>
+                @Html.DropDownListFor(m => m.CityPart2Id, new SelectList(Model.CityParts, "Id", "Name"), "--------", new { @class = "form-control mb-3 global-settings-select" })
+                <div>
+                    @Html.TextBoxFor(m => m.File2, new { @class = "image-input-field inputfile", type = "file", data_multiple_caption = "" })
+                    <label class="image-input-label" for="File2">
+                        <figure>
+                            <img id="File2img" src="/DynamicContent/CityPartsHomepage/@Model.CityPart2Image" alt="Preview Image" />
+                        </figure>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="form-group">
+                <label>Naselje 3</label>
+                @Html.DropDownListFor(m => m.CityPart3Id, new SelectList(Model.CityParts, "Id", "Name"), "--------", new { @class = "form-control mb-3 global-settings-select" })
+                <div>
+                    @Html.TextBoxFor(m => m.File3, new { @class = "image-input-field inputfile", type = "file", data_multiple_caption = "" })
+                    <label class="image-input-label" for="File3">
+                        <figure>
+                            <img id="File3img" src="/DynamicContent/CityPartsHomepage/@Model.CityPart3Image" alt="Preview Image" />
+                        </figure>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="form-group">
+                <label>Naselje 4</label>
+                @Html.DropDownListFor(m => m.CityPart4Id, new SelectList(Model.CityParts, "Id", "Name"), "--------", new { @class = "form-control mb-3 global-settings-select" })
+                <div>
+                    @Html.TextBoxFor(m => m.File4, new { @class = "image-input-field inputfile", type = "file", data_multiple_caption = "" })
+                    <label class="image-input-label" for="File4">
+                        <figure>
+                            <img id="File4img" src="/DynamicContent/CityPartsHomepage/@Model.CityPart4Image" alt="Preview Image" />
+                        </figure>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="form-group">
+                <label>Naselje 5</label>
+                @Html.DropDownListFor(m => m.CityPart5Id, new SelectList(Model.CityParts, "Id", "Name"), "--------", new { @class = "form-control mb-3 global-settings-select" })
+                <div>
+                    @Html.TextBoxFor(m => m.File5, new { @class = "image-input-field inputfile", type = "file", data_multiple_caption = "" })
+                    <label class="image-input-label" for="File5">
+                        <figure>
+                            <img id="File5img" src="/DynamicContent/CityPartsHomepage/@Model.CityPart5Image" alt="Preview Image" />
+                        </figure>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="form-group">
+                <label>Naselje 6</label>
+                @Html.DropDownListFor(m => m.CityPart6Id, new SelectList(Model.CityParts, "Id", "Name"), "--------", new { @class = "form-control mb-3 global-settings-select" })
+                <div>
+                    @Html.TextBoxFor(m => m.File6, new { @class = "image-input-field inputfile", type = "file", data_multiple_caption = "" })
+                    <label class="image-input-label" for="File6">
+                        <figure>
+                            <img id="File6img" src="/DynamicContent/CityPartsHomepage/@Model.CityPart6Image" alt="Preview Image" />
+                        </figure>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-block btn-success btn-save-listing"><i class="fa fa-check" aria-hidden="true"></i></button>
+        </div>
+    </div>
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/Select2js")
+    @Scripts.Render("~/bundles/globalSettingsJs")
+}

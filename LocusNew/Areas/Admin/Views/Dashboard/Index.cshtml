@@ -1,0 +1,146 @@
+﻿@model LocusNew.Core.AdminViewModels.DashboardViewModel
+@{
+    ViewBag.Title = "Početna";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-6 col-lg-6 col-xl-3">
+        <div class="card-box noradius noborder bg-primary">
+            <i class="fa fa-building float-right text-white" aria-hidden="true"></i>
+            <h6 class="text-white text-uppercase m-b-20">Nekretnina</h6>
+            <h1 class="m-b-20 text-white counter">@Model.ListingsNumber</h1>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-6 col-xl-3">
+        <div class="card-box noradius noborder bg-success">
+            <i class="fa fa-money float-right text-white" aria-hidden="true"></i>
+            <h6 class="text-white text-uppercase m-b-20">Kupaca</h6>
+            <h1 class="m-b-20 text-white counter">@Model.BuyersNumber</h1>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-6 col-xl-3">
+        <div class="card-box noradius noborder bg-warning">
+            <i class="fa fa-handshake-o float-right text-white" aria-hidden="true"></i>
+            <h6 class="text-white text-uppercase m-b-20">Prodavaca</h6>
+            <h1 class="m-b-20 text-white counter">@Model.SellersNumber</h1>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-6 col-xl-3">
+        <div class="card-box noradius noborder bg-info">
+            <i class="fa fa-users float-right text-white" aria-hidden="true"></i>
+            <h6 class="text-white text-uppercase m-b-20">Zaposlenika</h6>
+            <h1 class="m-b-20 text-white counter">@Model.EmployeesNumber</h1>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3><i class="fa fa-bar-chart-o"></i> Analiza nekretnina</h3>
+                Vizualni prikaz broja aktivnih, neaktivnih, rezervisanih i prodanih nekretnina.
+            </div>
+
+            <div class="card-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xl-9 m-auto">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer small text-muted">Ukupno nekretnina u bazi: <b>@Model.ListingsNumber</b></div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3><i class="fa fa-bar-chart-o"></i> Raspodjela nekretnina</h3>
+                Vizualni prikaz raspodjele nekretnina po agentima.
+            </div>
+
+            <div class="card-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xl-9 m-auto">
+                            <canvas id="pieChart2"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer small text-muted">Broj agenata: <b>@Model.Agents.Count()</b></div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/dashboardJS")
+    <script>
+        var ctx1 = document.getElementById("pieChart").getContext('2d');
+        var pieChart = new Chart(ctx1, {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: [@Model.ActiveListings, @Model.InactiveListings, @Model.ReservedListings, @Model.SoldListings],
+                    backgroundColor: [
+                        '#168c00',
+                        '#a1a7a5',
+                        '#e6692d',
+                        '#ff6384'
+                    ],
+                    label: 'Analiza nekretnina'
+                }],
+                labels: [
+                    "Aktivne",
+                    "Neaktivne",
+                    "Rezervisane",
+                    "Prodane"
+                ]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        @{
+            string[] agentColors = new string[]
+            {"rgba(255,99,132,1)", "rgba(54, 162, 235, 1)", "rgba(255, 206, 86, 1)", "rgba(75, 192, 192, 1)", "rgba(153, 102, 255, 1)", "rgba(255, 159, 64, 1)" };
+        }
+
+        var ctx2 = document.getElementById("pieChart2").getContext('2d');
+        var pieChart = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: [
+                        @foreach(var agentNumber in Model.Agents)
+                        {
+                            @: @agentNumber.NumberOfListings ,
+                        }
+                    ],
+                    backgroundColor: [
+                        @for(int i = 0; i < agentColors.Length; i++)
+                        {
+                            @: '@agentColors[i]' ,
+                        }
+                    ],
+                    label: 'Raspodjela nekretnina'
+                }],
+                labels: [
+                    @foreach (var agent in Model.Agents)
+                    {
+                        @: '@agent.Name' ,
+                    }
+                ]
+            },
+            options: {
+                responsive: true
+            }
+
+        });
+    </script>
+}

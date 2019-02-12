@@ -1,0 +1,227 @@
+﻿@model LocusNew.Core.ViewModels.SearchViewModel
+@using PagedList.Mvc;
+@section metatags{
+    <link href="https://www.locus.ba/search" rel="canonical" />
+    <meta property="og:image" content="https://www.locus.ba/Content/images/logo-main.png">
+}
+@{
+    ViewBag.Title = "Pretraži nekretnine";
+    Layout = "~/Views/Shared/_LayoutInner.cshtml";
+}
+
+@section styles{
+    @Styles.Render("~/Content/datepickerCss");
+}
+
+    <div class="container-fluid listings">
+        @using (Html.BeginForm("Index", "Search", FormMethod.Get, new { @id = "SearchForm" }))
+        {
+            <a href="javascript: void(0);" id="toggleSearch" class="button btn-block mb-3 mobile"><i class="fas fa-bars ml-auto"></i><span style="float: right;"> Podesi pretragu</span></a>
+            <div class="search-cont">
+                <div class="row">
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="form-group">
+                            <label>Naselje:</label>
+                            <input type="text" name="cityPart" id="cityPart" class="form-control" autocomplete="off" value="@Model.SearchForm.selectedCityPartName" />
+                            @Html.Hidden("cityPartId")
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="form-group">
+                            <label>Prodaja:</label>
+                            @Html.DropDownList("adType", new SelectList(Model.SearchForm.AdTypes, "Id", "Name", Model.SearchForm.selectedSaleLease), "Odaberite", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="form-group">
+                            <label>Tip nekretnine:</label>
+                            @Html.DropDownList("propertyType", new SelectList(Model.SearchForm.PropertyTypes, "Id", "Name", Model.SearchForm.selectedListingType), "Odaberite", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="form-group">
+                            <label>Sprat:</label>
+                            @Html.DropDownList("floor", new SelectList(Model.SearchForm.ListFloors, "Value", "Text", Model.SearchForm.selectedFloor), new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="form-group">
+                            <label>Soba:</label>
+                            @Html.DropDownList("beds", new SelectList(Model.SearchForm.BathsBeds, "Value", "Text", Model.SearchForm.selectedBeds), "0+", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="form-group">
+                            <label>Min. cijena:</label>
+                            <input type="number" name="minPrice" id="minPrice" class="form-control" min="0" placeholder="KM" value="@Model.SearchForm.selectedMinPrice" />
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="form-group">
+                            <label>Max. cijena:</label>
+                            <input type="number" name="maxPrice" id="maxPrice" class="form-control" min="0" placeholder="KM" value="@Model.SearchForm.selectedMaxPrice" />
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="form-group">
+                            <label>Šifra nekretnine:</label>
+                            <input type="text" name="listingNumber" id="listingNumber" class="form-control" autocomplete="off" value="@Model.SearchForm.selectedListingNumber" />
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 ml-auto">
+                        <div class="form-group">
+                            <button class="button btn-block search-btn" type="submit">Traži <i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 mb-3">
+                <div class="row">
+                    <div class="col-12">
+                        <p class="ptnarrow">
+                            Ukoliko ste zainteresovani za kupovinu nekretnine, a niste pronašli željenu nekretninu na našoj web-stranici, molimo Vas da nas direktno kontaktirate putem brojeva telefona ili email adrese:
+                            <br />
+                            Tel: <a href="tel:033/711-100">033/711-100</a>
+                            <br />
+                            Mob/Viber/WhatsApp: <a href="tel:061/163-233">061/163-233</a>
+                            <br />
+                            Email: <a href="mailto:info@locus.ba">info@locus.ba</a>
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="mb-sm-0 mt-sm-3"><i>Ukupno rezultata:</i> <b>@ViewData["ResultNumber"]</b></p>
+                    </div>
+                    <div class="col-sm-6 ml-auto text-sm-right">
+                        Sortiraj: @Html.DropDownList("sortOrder", new SelectList(Model.SearchForm.SortOrder, "Value", "Text", Model.SearchForm.selectedSortOrder), new { @class = "form-control d-inline w-auto" })
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="row">
+            @foreach (var listing in Model.Listings)
+            {
+                var newClass = "";
+                bool isOglas = listing.AdType.Name == "Oglas";
+                if (isOglas)
+                {
+                    newClass = "adv";
+                }
+                <div class="col-xl-3 col-sm-6">
+                    <a href="@Url.Action("Listing", "Search", new { @id = listing.Id })">
+                        <div class="listing @newClass">
+                            <img src="https://www.locus.ba/@listing.Image.FilePath/@listing.Image.FileName">
+                            @if (listing.isReserved)
+                            {
+                                <img src="https://www.locus.ba/Content/Images/reserved.png" alt="prodano" class="sold-img" />
+                            }
+                            <div class="overlay">
+                                @if (listing.AdType.Name != "Oglas")
+                                {
+                                    <div class="address">
+                                        <i class="fas fa-map-marker-alt"></i> @listing.Address, @listing.CityPart.Name
+                                    </div>
+                                    <div class="bed-bath">
+                                        @if (listing.PropertyType.Name != "Zemljište")
+                                        {
+                                            if (listing.MultiBedrooms)
+                                            {
+                                                <span>
+                                                    <i class="fas fa-bed"></i> @listing.MultiBedroomsFrom - @listing.MultiBedroomsTo
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span>
+                                                    <i class="fas fa-bed"></i> @listing.Bedrooms
+                                                </span>
+                                            }
+                                            if (listing.MultiBathrooms)
+                                            {
+                                                <span>
+                                                    <i class="fas fa-bath"></i> @listing.MultiBathFrom - @listing.MultiBathTo
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span>
+                                                    <i class="fas fa-bath"></i> @listing.Bathrooms
+                                                </span>
+                                            }
+                                            if (listing.MultiSquareMeters)
+                                            {
+                                                <span>
+                                                    <i class="fas fa-vector-square"></i> @listing.MultiSquareMetersFrom - @listing.MultiSquareMetersTo m<sup>2</sup>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span>
+                                                    <i class="fas fa-vector-square"></i> @listing.SquareMeters m<sup>2</sup>
+                                                </span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span>
+                                                <i class="fas fa-vector-square"></i> @listing.LotSquareMeters m<sup>2</sup>
+                                            </span>
+                                        }
+                                    </div>
+                                }
+                                @if (listing.AdType.Name != "Oglas")
+                                {
+                                    if (listing.Price > 0)
+                                    {
+                                        string price;
+                                        <div class="price">
+                                            @if (listing.MultiPrice)
+                                            {
+                                                price = listing.MultiPriceFrom.HasValue && listing.MultiPriceTo.HasValue ? listing.MultiPriceFrom.Value.ToString("0,0") + " - " + listing.MultiPriceTo.Value.ToString("0,0") : "N/A";
+                                            }
+                                            else
+                                            {
+                                                price = listing.Price.HasValue ? listing.Price.Value.ToString("0,0") : "N/A";
+                                            }
+                                            @price KM
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="price">Na upit</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="price">Oglas</div>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+        @Html.PagedListPager(Model.Listings, page => Url.Action("Index", new { page,
+            currentFilter = ViewBag.CurrentFilter,
+            sortOrder = Model.SearchForm.selectedSortOrder,
+            @cityPartId = Model.SearchForm.selectedCityPart,
+            @adType = Model.SearchForm.selectedSaleLease,
+            @propertyType = Model.SearchForm.selectedListingType,
+            @cityPart = Model.SearchForm.selectedCityPartName,
+            @ListFloors = Model.SearchForm.selectedFloor,
+            @listingNumber = Model.SearchForm.selectedListingNumber,
+            @beds = Model.SearchForm.selectedBeds,
+            @minPrice = Model.SearchForm.selectedMinPrice,
+            @maxPrice = Model.SearchForm.selectedMaxPrice
+        }),new PagedListRenderOptions {
+            MaximumPageNumbersToDisplay = 5,
+            DisplayLinkToPreviousPage = PagedListDisplayMode.Never,
+            DisplayLinkToNextPage = PagedListDisplayMode.Never,
+            DisplayPageCountAndCurrentLocation = true,
+            PageCountAndCurrentLocationFormat = "Stranica {0} od {1}"
+        })
+    </div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/jquiJS")
+    @Scripts.Render("~/bundles/searchScript")
+}

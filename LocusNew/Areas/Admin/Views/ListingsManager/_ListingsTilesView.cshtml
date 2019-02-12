@@ -1,0 +1,24 @@
+﻿@model IEnumerable<LocusNew.Core.AdminViewModels.AdminListingsListViewModel>
+
+<div class="row">
+    @foreach (var m in Model)
+    {
+        <div class="col-xl-3 col-sm-6">
+            <div class="card">
+                <img class="card-img-top" src="https://www.locus.ba/@m.ImagePath/@m.ImageName" alt="@m.ImageName">
+                <div class="card-body">
+                    <h6 class="card-title">@m.Address, @m.CityPart</h6>
+                    <p class="card-text">@m.AgentName</p>
+                    <p class="card-text">
+                        @{string price = m.Price.HasValue ? m.Price.Value.ToString("0,0") : "N/A";}
+                        @price KM
+                    </p>
+                    <p class="card-text">@m.LeaseSale</p>
+                    <a href="@Url.Action("EditListing", "ListingsManager", new { @id = m.Id })" class="btn btn-primary btn-block mb-2">Uredi</a>
+                    <a href="@Url.Action("SetAsSold", "ListingsManager", new { @id = m.Id })" class="btn btn-primary btn-block mb-2">Prodano</a>
+                    <button id="DeleteListingButton" type="button" class="btn btn-primary btn-block mb-2" data-listingid="@m.Id" data-toggle="modal" data-target="#DeleteListingModal">Izbriši</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

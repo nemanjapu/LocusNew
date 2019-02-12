@@ -1,0 +1,56 @@
+﻿@model PagedList.IPagedList<LocusNew.Core.ViewModels.ListingsListViewModel>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Prodano";
+    Layout = "~/Views/Shared/_LayoutInner.cshtml";
+}
+<div class="container-fluid listings">
+    <h1 class="heading blue text-left">Prodane nekretnine</h1>
+    <div class="row">
+        @foreach (var listing in Model)
+        {
+            <div class="col-xl-3 col-sm-6">
+                <a href="@Url.Action("Listing", "Search", new { @id = listing.Id })">
+                    <div class="listing">
+                        <img src="https://www.locus.ba/@listing.Image.FilePath/@listing.Image.FileName" alt="@listing.Address, @listing.CityPart.Name, Sarajevo">
+                        <img src="~/Content/Images/sold.png" alt="prodano" class="sold-img" />
+                        <div class="overlay">
+                            <div class="address">
+                                <i class="fas fa-map-marker-alt"></i> @listing.Address, @listing.CityPart.Name
+                            </div>
+                            <div class="bed-bath">
+                                @if (listing.AdType.Name != "Zemljište")
+                                {
+                                    <span>
+                                        <i class="fas fa-bed"></i> @listing.Bedrooms
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-bath"></i> @listing.Bathrooms
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-vector-square"></i> @listing.SquareMeters m<sup>2</sup>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        <i class="fas fa-vector-square"></i> @listing.SquareMeters m<sup>2</sup>
+                                    </span>
+                                }
+                            </div>
+                            @if (listing.AdType.Name == "Iznajmljivanje")
+                            {
+                                <div class="price">Iznajmljeno</div>
+                            }
+                            else
+                            {
+                                <div class="price">Prodano</div>
+                            }
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+    @Html.PagedListPager(Model, page => Url.Action("Sold", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+</div>

@@ -1,0 +1,22 @@
+﻿<div class="modal fade" tabindex="-1" role="dialog" id="DeleteListingModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="text-center text-danger mb-4 info-icon">
+                    <i class="fa fa-question-circle" aria-hidden="true"></i>
+                </div>
+                <h5 class="text-center">Da li ste sigurni da želite izbrisati nekretninu?</h5>
+            </div>
+            @using (Html.BeginForm("DeleteListing", "ListingsManager", FormMethod.Post))
+            {
+                <div class="modal-footer">
+
+                    @Html.AntiForgeryToken()
+                    <input id="ListingIdInput" type="hidden" name="Id" value="" />
+                    <button type="submit" class="btn btn-danger m-auto">Izbriši</button>
+                    <button type="button" class="btn btn-light m-auto" data-dismiss="modal">Poništi</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+﻿@model IEnumerable<LocusNew.Core.AdminViewModels.SellerLeadsViewModel>
+@{
+    ViewBag.Title = "Otkup / prodaja";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Otkup nekretnine</h2>
+
+<div class="table-overflow">
+    <table class="table table-bordered datatable-table" style="width:100%">
+        <thead>
+            <tr>
+                <th>Vrsta</th>
+                <th>Primljeno</th>
+                <th>Ime i prezime</th>
+                <th>Broj Telefona</th>
+                <th>Email</th>
+                <th>Vrsta nekretnine</th>
+                <th>Adresa</th>
+                <th>Kvadratura</th>
+                <th>Spratnost</th>
+                <th>Lift</th>
+                <th>Balkon</th>
+                <th>Tražena cijena</th>
+                <th>Izbriši</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td>@(s.IsRepurchasing ? "Otkup" : s.IsSelling ? "Prodaja" : "")</td>
+                    <td data-order="@s.Date.ToString("yyyy-MM-dd HH:mm")">@s.Date.ToString("dd.MM.yyyy. HH:mm")</td>
+                    <td>@s.Name</td>
+                    <td>@s.Phone</td>
+                    <td>@s.Email</td>
+                    <td>@s.PropertyType.Name</td>
+                    <td>@s.Address</td>
+                    <td>@s.SquareMeters</td>
+                    <td>@s.Floor</td>
+                    <td>@s.Elevator</td>
+                    <td>@s.Balcony</td>
+                    <td>@s.FeeWanted</td>
+                    <td>
+                        @using (Html.BeginForm("DeleteSellerLead", "SellerLeadsManager", FormMethod.Post, new { @class = "DeleteListingForm" }))
+                        {
+                            var modalId = "deleteListing" + s.Id;
+                            <input type="hidden" name="Id" value="@s.Id" />
+                            <a class="table-anchor" id="deleteListingBtn" data-toggle="modal" data-target="#@modalId" href="javascript:void(0);"><i class="fa fa-trash" aria-hidden="true"></i></a>
+
+                            <div class="modal fade" tabindex="-1" role="dialog" id="@modalId">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="text-center text-danger mb-4 info-icon">
+                                                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                            </div>
+                                            <h5 class="text-center">Da li ste sigurni da želite izbrisati ovaj zapis?</h5>
+                                        </div>
+                                        <div class="modal-footer">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger m-auto" id="ConfirmDelete">Izbriši</button>
+                                            <button type="button" class="btn btn-light m-auto" data-dismiss="modal">Poništi</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@section scripts{
+    @Scripts.Render("~/bundles/dataTableInit")
+}

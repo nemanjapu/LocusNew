@@ -1,0 +1,124 @@
+﻿@using LocusNew.Core.AdminViewModels
+@model LocusNew.Core.AdminViewModels.BuyersSellersViewModel
+@{
+    ViewBag.Title = "Kupci i prodavci";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Kupci</h2>
+
+<div class="mb-4 table-overflow">
+    <table class="table table-bordered datatable-table" style="width:100%">
+        <thead>
+            <tr>
+                <th>Ime i prezime</th>
+                <th>Broj Telefona</th>
+                <th>Email</th>
+                <th>Adresa</th>
+                <th>Br. lične karte</th>
+                <th>Uredi</th>
+                <th>Izbriši</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in Model.BuyersList)
+            {
+                <tr>
+                    <td>@b.FullName</td>
+                    <td>@b.Phone</td>
+                    <td>@b.Email</td>
+                    <td>@b.Address</td>
+                    <td>@b.IdNumber</td>
+                    <td><a class="table-anchor" href="@Url.Action("EditBuyer", "BuyersAndSellers", new { @id = b.Id })"><i class="fa fa-pencil-square-o"></i></a></td>
+                    <td>
+                        @using (Html.BeginForm("DeleteBuyer", "BuyersAndSellers", FormMethod.Post, new { @class = "DeleteListingForm" }))
+                        {
+                            var modalId = "deleteListing" + b.Id;
+                            <input type="hidden" name="Id" value="@b.Id" />
+                            <a class="table-anchor" id="deleteListingBtn" data-toggle="modal" data-target="#@modalId" href="javascript:void(0);">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                            <div class="modal fade" tabindex="-1" role="dialog" id="@modalId">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="text-center text-danger mb-4 info-icon">
+                                                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                            </div>
+                                            <h5 class="text-center">Da li ste sigurni da želite izbrisati ovaj zapis?</h5>
+                                        </div>
+                                        <div class="modal-footer">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger m-auto" id="ConfirmDelete">Izbriši</button>
+                                            <button type="button" class="btn btn-light m-auto" data-dismiss="modal">Poništi</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<h2>Prodavci</h2>
+<div class="mb-4 table-overflow">
+    <table class="table table-bordered datatable-table" style="width:100%">
+        <thead>
+            <tr>
+                <th>Ime i prezime</th>
+                <th>Broj Telefona</th>
+                <th>Email</th>
+                <th>Adresa</th>
+                <th>Br. lične karte</th>
+                <th>Uredi</th>
+                <th>Izbriši</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in Model.SellersList)
+            {
+                <tr>
+                    <td>@b.FullName</td>
+                    <td>@b.Phone</td>
+                    <td>@b.Email</td>
+                    <td>@b.Address</td>
+                    <td>@b.IdNumber</td>
+                    <td><a class="table-anchor" href="@Url.Action("EditSeller", "BuyersAndSellers", new { @id = b.Id })"><i class="fa fa-pencil-square-o"></i></a></td>
+                    <td>
+                        @using (Html.BeginForm("DeleteSeller", "BuyersAndSellers", FormMethod.Post, new { @class = "DeleteListingForm" }))
+                        {
+                            var modalId = "deleteListing" + b.Id;
+                            <input type="hidden" name="Id" value="@b.Id" />
+                            <a class="table-anchor" id="deleteListingBtn" data-toggle="modal" data-target="#@modalId" href="javascript:void(0);">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                            <div class="modal fade" tabindex="-1" role="dialog" id="@modalId">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="text-center text-danger mb-4 info-icon">
+                                                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                            </div>
+                                            <h5 class="text-center">Da li ste sigurni da želite izbrisati ovaj zapis?</h5>
+                                        </div>
+                                        <div class="modal-footer">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger m-auto" id="ConfirmDelete">Izbriši</button>
+                                            <button type="button" class="btn btn-light m-auto" data-dismiss="modal">Poništi</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/dataTableInit")
+}

@@ -1,0 +1,96 @@
+﻿@model LocusNew.Core.ViewModels.SellerLeadViewModel
+@{
+    ViewBag.Title = "Otkup nekretnine";
+    Layout = "~/Views/Shared/_LayoutInner.cshtml";
+}
+
+<div class="container-fluid">
+    <h1 class="heading blue">Otkup nekretnina</h1>
+    <div class="row">
+        <div class="col-xl-7">
+            <p class="ptnarrow">
+                Ukoliko ste zainteresovani za brzu prodaju, u mogućnosti smo da Vam ponudimo direktan otkup nekretnina prvenstveno na području grada, a u nekim slučajevima i šireg lokaliteta Kantona Sarajevo. Ukoliko ste zainteresovani molimo Vas da popunite ispod navedene podatke ili nas direktno kontaktirate na brojeve telefona ili email adresu:
+                <br />
+                Tel: <a href="tel:033 711-100">033 711-100</a>
+                <br />
+                Mob/Viber/WhatsApp: <a href="tel:061/163-233">061/163-233</a>
+                <br />
+                Email: <a href="mailto:info@locus.ba">info@locus.ba</a>
+            </p>
+            @using (Ajax.BeginForm("Submit", "Selling", null, new AjaxOptions
+            {
+                HttpMethod = "POST",
+                InsertionMode = InsertionMode.Replace,
+                UpdateTargetId = "FormCont"
+            }))
+            {
+                <div class="row" id="FormCont">
+                    <div class="col-xl-6">
+                        <div class="form-group">
+                            <label>*Ime i prezime:</label>
+                            @Html.HiddenFor(m => m.IsRepurchasing)
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name)
+                        </div>
+                        <div class="form-group">
+                            <label>*Telefon:</label>
+                            @Html.TextBoxFor(m => m.Phone, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Phone)
+                        </div>
+                        <div class="form-group">
+                            <label>*E-mail:</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Email)
+                        </div>
+                        <div class="form-group">
+                            <label>*Tip nekretnine:</label>
+                            @Html.DropDownListFor(m => m.PropertyTypeId, new SelectList(Model.PropertyTypes, "Id", "Name"), "Tip nekretnine", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.PropertyTypeId)
+                        </div>
+                        <div class="form-group">
+                            <label>*Adresa:</label>
+                            @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Address)
+                        </div>
+                    </div>
+                    <div class="col-xl-6">
+                        <div class="form-group">
+                            <label>*Kvadratura:</label>
+                            @Html.TextBoxFor(m => m.SquareMeters, new { @class = "form-control", @type = "number", @min = "0" })
+                            @Html.ValidationMessageFor(m => m.SquareMeters)
+                        </div>
+                        <div class="form-group">
+                            <label>Spratnost:</label>
+                            @Html.TextBoxFor(m => m.Floor, new { @class = "form-control", @type = "number", @min = "0" })
+                            @Html.ValidationMessageFor(m => m.Floor)
+                        </div>
+                        <div class="form-group">
+                            <label>Lift:</label>
+                            @Html.DropDownListFor(m => m.Elevator, new SelectList(new[] { new { Value = "true", Text = "Da" }, new { Value = "false", Text = "Ne" } }, "Value", "Text"), new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Elevator)
+                        </div>
+                        <div class="form-group">
+                            <label>Balkon:</label>
+                            @Html.DropDownListFor(m => m.Balcony, new SelectList(new[] { new { Value = "true", Text = "Da" }, new { Value = "false", Text = "Ne" } }, "Value", "Text"), new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Balcony)
+                        </div>
+                        <div class="form-group">
+                            <label>*Tražena cijena:</label>
+                            @Html.TextBoxFor(m => m.FeeWanted, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.FeeWanted)
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <p><small>*Obavezna polja</small></p>
+                        @Html.AntiForgeryToken()
+                        <button class="button" type="submit" id="FormSubmitBtn">pošalji</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/sell-repurchaceScript")
+}

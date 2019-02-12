@@ -1,0 +1,77 @@
+﻿@model LocusNew.Core.AdminViewModels.AdminSearchFormViewModel
+
+
+<div class="row">
+    <div class="col-xl col-sm-6">
+        <div class="form-group">
+            <label>Šifra nekretnine:</label>
+            <input type="text" name="listingNumber" id="listingNumber" class="form-control" autocomplete="off" value="@Model.selectedListingNumber" />
+        </div>
+    </div>
+    <div class="col-xl col-sm-6">
+        <div class="form-group">
+            <label>Agent:</label>
+            @Html.DropDownList("agent", new SelectList(Model.Agents, "Id", "FullName", Model.AgentId), "Odaberite", new { @class = "form-control js-select2" })
+        </div>
+    </div>
+    <div class="col-xl col-sm-6">
+        <div class="form-group">
+            <label>Naselje:</label>
+            @Html.DropDownList("cityPartId", new SelectList(Model.CityParts, "Id", "Name", Model.CityPartId), "Odaberite", new { @class = "form-control js-select2" })
+        </div>
+    </div>
+    <div class="col-xl col-sm-6">
+        <div class="form-group">
+            <label>Tip akcije:</label>
+            @Html.DropDownList("adType", new SelectList(Model.AdTypes, "Id", "Name", Model.selectedSaleLease), "Odaberite", new { @class = "form-control js-select2" })
+        </div>
+    </div>
+    <div class="col-xl col-sm-6">
+        <div class="form-group">
+            <label>Tip nekretnine:</label>
+            @Html.DropDownList("propertyType", new SelectList(Model.PropertyTypes, "Id", "Name", Model.selectedListingType), "Odaberite", new { @class = "form-control js-select2" })
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl col-sm-6">
+        <div class="form-group">
+            <label>Sprat:</label>
+            @Html.DropDownList("floor", new SelectList(Model.ListFloors, "Value", "Text", Model.selectedFloor), new { @class = "form-control js-select2" })
+        </div>
+    </div>
+    <div class="col-xl col-sm-6">
+        <div class="form-group">
+            <label>Soba:</label>
+            @Html.DropDownList("beds", new SelectList(Model.BathsBeds, "Value", "Text", Model.selectedBeds), "0+", new { @class = "form-control js-select2" })
+        </div>
+    </div>
+    <div class="col-xl col-sm-6">
+        <div class="form-group">
+            <label>Min. cijena:</label>
+            <input type="number" name="minPrice" id="minPrice" class="form-control" min="0" placeholder="KM" value="@Model.selectedMinPrice" />
+        </div>
+    </div>
+    <div class="col-xl col-sm-6">
+        <div class="form-group">
+            <label>Max. cijena:</label>
+            <input type="number" name="maxPrice" id="maxPrice" class="form-control" min="0" placeholder="KM" value="@Model.selectedMaxPrice" />
+        </div>
+    </div>
+    <div class="col-xl col-sm-6">
+        <div class="form-group">
+            <label>&nbsp;</label>
+            <button class="btn btn-block btn-primary" type="submit">Traži <i class="fa fa-search"></i></button>
+        </div>
+    </div>
+</div>
+<div class="pt-3 mb-3">
+    <div class="row">
+        <div class="col-sm-6">
+            <p class="mb-sm-0 mt-sm-3"><i>Ukupno rezultata:</i> <b>@ViewData["ResultNumber"]</b></p>
+        </div>
+        <div class="col-sm-6 ml-auto text-sm-right">
+            Sortiraj: @Html.DropDownList("sortOrder", new SelectList(Model.SortOrder, "Value", "Text", Model.selectedSortOrder), new { @class = "form-control d-inline w-auto" })
+        </div>
+    </div>
+</div>
